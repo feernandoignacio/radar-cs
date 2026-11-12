@@ -5,6 +5,7 @@ import { GoalCard } from './components/GoalCard.tsx';
 import { Header } from './components/Header.tsx';
 import { ImportPanel } from './components/ImportPanel.tsx';
 import { MessageEditor } from './components/MessageEditor.tsx';
+import { SendQueue, type Queue } from './components/SendQueue.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
 import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
@@ -34,6 +35,7 @@ function App() {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importInfo, setImportInfo] = useState('');
   const [settings, setSettings] = useState(loadSettings);
+  const [queue, setQueue] = useState<Queue | null>(null);
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -88,6 +90,50 @@ function App() {
       ),
     );
   }
+
+  // Monta a fila com os selecionados, na ordem da tabela
+  function handleStartQueue() {
+    const selected = clients.filter((client) => selectedIds.has(client.id));
+    const withPhone = selected.filter((client) => clientPhone(client));
+    setQueue({
+      ids: withPhone.map((client) => client.id),
+      index: 0,
+      sent: 0,
+      skipped: 0,
+      withoutPhone: selected.length - withPhone.length,
+    });
+    // No celular a fila fica embaixo da tabela, então rola até ela
+    requestAnimationFrame(() =>
+      document
+        .getElementById('send-queue')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
+    );
+  }
+
+  function handleQueueNext(wasSent: boolean) {
+    setQueue((prev) =>
+      prev
+        ? {
+            ...prev,
+            index: prev.index + 1,
+            sent: prev.sent + (wasSent ? 1 : 0),
+            skipped: prev.skipped + (wasSent ? 0 : 1),
+          }
+        : prev,
+    );
+  }
+
+  function handleQueueClose() {
+    // Se terminou a fila, limpa a seleção
+    if (queue && queue.index >= queue.ids.length) {
+      setSelectedIds(new Set());
+    }
+    setQueue(null);
+  }
+
+  const queueClient = queue
+    ? clients.find((client) => client.id === queue.ids[queue.index])
+    : undefined;
 
   function handleContactChange(id: string, patch: ContactPatch) {
     setClients((prev) =>
@@ -187,11 +233,11 @@ function App() {
               total={summary.total}
               onChange={setFilter}
             />
-            {/* O envio em fila ganha função na parte 5 */}
             <button
               type="button"
               className="app-send-button"
-              disabled={selectedIds.size === 0}
+              disabled={selectedIds.size === 0 || queue !== null}
+              onClick={handleStartQueue}
             >
               Enviar para {selectedIds.size}{' '}
               {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
@@ -214,6 +260,16 @@ function App() {
         </section>
 
         <aside className="app-aside">
+          {queue && (
+            <SendQueue
+              queue={queue}
+              client={queueClient}
+              settings={settings}
+              onOpen={handleWhatsapp}
+              onNext={handleQueueNext}
+              onClose={handleQueueClose}
+            />
+          )}
           <MessageEditor
             settings={settings}
             previewClient={visibleClients[0] ?? clients[0]}

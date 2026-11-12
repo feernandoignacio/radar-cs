@@ -1,0 +1,120 @@
+.send-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border: 2px solid var(--accent-border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.send-queue h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.send-queue-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.send-queue-count {
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.send-queue-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #eceef1;
+}
+
+.send-queue-bar div {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.send-queue-warning {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff1d6;
+  color: #7a4a06;
+  font-size: 12px;
+}
+
+.send-queue-client {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.send-queue-client span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.send-queue-client strong {
+  font-size: 15px;
+}
+
+.send-queue-message {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: #1e2a24;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.send-queue-primary {
+  height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #128a5c;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.send-queue-primary:hover {
+  background: #0e6b47;
+}
+
+.send-queue-secondary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.send-queue-secondary button {
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.send-queue-secondary button:hover {
+  border-color: var(--text-muted);
+}
+
+.send-queue-summary {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .send-queue-bar div {
+    transition: none;
+  }
+}
