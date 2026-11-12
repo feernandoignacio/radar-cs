@@ -44,6 +44,7 @@ export function ImportPanel({
   const [unknownFiles, setUnknownFiles] = useState<string[]>([]);
   const [isReading, setIsReading] = useState(false);
   const [keepStatus, setKeepStatus] = useState(hasSavedBatch);
+  const [importError, setImportError] = useState('');
 
   // Fecha com Esc
   useEffect(() => {
@@ -75,6 +76,7 @@ export function ImportPanel({
     }
 
     setFiles((prev) => ({ ...prev, ...found }));
+    setImportError('');
     setUnknownFiles(unknown);
     setIsReading(false);
   }
@@ -88,6 +90,13 @@ export function ImportPanel({
       previous,
       keepStatus,
     });
+    // Não troca o lote atual por um vazio
+    if (clients.length === 0) {
+      setImportError(
+        'Não encontrei nenhuma empresa no lote. Confira se é o arquivo certo.',
+      );
+      return;
+    }
     onImport(clients);
   }
 
@@ -148,6 +157,12 @@ export function ImportPanel({
         {unknownFiles.length > 0 && (
           <p className="import-error" role="alert">
             Não reconheci: {unknownFiles.join(', ')}
+          </p>
+        )}
+
+        {importError && (
+          <p className="import-error" role="alert">
+            {importError}
           </p>
         )}
 

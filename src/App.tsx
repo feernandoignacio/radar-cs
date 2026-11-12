@@ -17,6 +17,7 @@ import {
   type MessageSettings,
 } from './utils/message.ts';
 import {
+  clearAll,
   loadBatch,
   loadSettings,
   saveBatch,
@@ -129,6 +130,15 @@ function App() {
       setSelectedIds(new Set());
     }
     setQueue(null);
+  }
+
+  function handleClearData() {
+    const ok = window.confirm(
+      'Apagar o lote, os contatos digitados e o modelo de mensagem deste navegador? Isso não pode ser desfeito.',
+    );
+    if (!ok) return;
+    clearAll();
+    window.location.reload();
   }
 
   const queueClient = queue
@@ -277,6 +287,17 @@ function App() {
           />
         </aside>
       </div>
+
+      <footer className="app-footer">
+        <p>
+          Os dados ficam só neste navegador. Nada é enviado para servidores.
+        </p>
+        {!isSample && (
+          <button type="button" onClick={handleClearData}>
+            Apagar dados deste navegador
+          </button>
+        )}
+      </footer>
 
       {isImportOpen && (
         <ImportPanel

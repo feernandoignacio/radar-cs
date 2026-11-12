@@ -42,3 +42,13 @@ export function saveSettings(settings: MessageSettings) {
     // Segue sem salvar
   }
 }
+
+// Botão "Apagar dados": tira tudo deste navegador
+export function clearAll() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_KEY);
+  } catch {
+    // Nada a fazer
+  }
+}

@@ -107,6 +107,30 @@
   background: rgba(0, 0, 0, 0.06);
 }
 
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.app-footer button {
+  padding: 8px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: #9b1c1c;
+  font-size: 13px;
+}
+
+.app-footer button:hover {
+  border-color: #9b1c1c;
+}
+
 @media (max-width: 900px) {
   .app {
     padding: 20px 16px 40px;
