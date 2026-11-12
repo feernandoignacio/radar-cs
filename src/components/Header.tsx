@@ -1,3 +1,4 @@
+import { currentMonth } from '../utils/date.ts';
 import './Header.css';
 
 type HeaderProps = {
@@ -6,16 +7,9 @@ type HeaderProps = {
   inReview: number;
   onImportClick: () => void;
   onClearClick: () => void;
+  onPdfClick: () => void;
+  isExporting: boolean;
 };
-
-// "novembro de 2026" -> "Novembro de 2026"
-function currentMonth() {
-  const text = new Date().toLocaleDateString('pt-BR', {
-    month: 'long',
-    year: 'numeric',
-  });
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
 
 export function Header({
   batchName,
@@ -23,6 +17,8 @@ export function Header({
   inReview,
   onImportClick,
   onClearClick,
+  onPdfClick,
+  isExporting,
 }: HeaderProps) {
   return (
     <header className="header">
@@ -36,7 +32,20 @@ export function Header({
             {batchName} · {total} clientes prioritários
             {inReview > 0 && ` · ${inReview} em análise`}
           </p>
-          <p className="header-month">{currentMonth()}</p>
+          <div className="header-month-row">
+            <p className="header-month">{currentMonth()}</p>
+            <button
+              type="button"
+              className="header-pdf"
+              disabled={isExporting}
+              onClick={onPdfClick}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+              </svg>
+              {isExporting ? 'Gerando...' : 'Baixar PDF'}
+            </button>
+          </div>
         </div>
       </div>
 

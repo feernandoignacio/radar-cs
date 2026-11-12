@@ -15,6 +15,8 @@ Built to solve a real problem: the official dashboard only lists the batch and t
 - **Message template** with variables (`{contato}`, `{empresa}`, `{meu_nome}`, `{link_agenda}`) and live preview
 - **One-click WhatsApp**: opens WhatsApp Web with the number and the message ready
 - **Send queue**: goes through the selected clients one by one
+- **Editable table**: add blank rows, delete rows, edit the reason inline, "Em análise" status left out of the goal
+- **PDF export**: downloads the whole table with the goal summary, generated in the browser (jsPDF is loaded only on click)
 
 ## Privacy
 
@@ -23,7 +25,7 @@ There is no backend. Spreadsheets are read in the browser and all data stays in 
 ## Tech
 
 - React 19, TypeScript, Vite
-- PapaParse for CSV
+- PapaParse for CSV, jsPDF + AutoTable for the PDF export
 - A small custom `.xlsx` reader built on fflate: the Power BI export uses a format (prefixed XML, inline strings, no cell addresses) that common libraries fail to read, so the app unzips the file and reads the sheet XML directly
 
 ## Running locally

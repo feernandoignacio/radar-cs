@@ -25,6 +25,8 @@ import {
   saveBatch,
   saveSettings,
 } from './utils/storage.ts';
+import { currentMonth } from './utils/date.ts';
+import { exportPdf } from './utils/exportPdf.ts';
 import { getSummary } from './utils/summary.ts';
 import './App.css';
 
@@ -50,6 +52,7 @@ function App() {
     { kind: 'delete'; client: Client } | { kind: 'clear' } | null
   >(null);
   const closeConfirm = useCallback(() => setConfirm(null), []);
+  const [isExporting, setIsExporting] = useState(false);
 
   const isSample = importedAt === null;
   const summary = getSummary(clients);
@@ -146,6 +149,15 @@ function App() {
       setSelectedIds(new Set());
     }
     setQueue(null);
+  }
+
+  async function handlePdf() {
+    setIsExporting(true);
+    try {
+      await exportPdf({ clients, month: currentMonth(), batchName });
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   function handleClearData() {
@@ -280,6 +292,8 @@ function App() {
           inReview={summary.inReview}
           onImportClick={() => setIsImportOpen(true)}
           onClearClick={() => setConfirm({ kind: 'clear' })}
+          onPdfClick={handlePdf}
+          isExporting={isExporting}
         />
 
         {isSample && (

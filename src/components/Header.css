@@ -37,8 +37,15 @@
   color: var(--text-muted);
 }
 
-.header-month {
+.header-month-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
   margin-top: 4px;
+}
+
+.header-month {
   color: var(--accent-text);
   font-size: 13px;
   font-weight: 600;
@@ -71,4 +78,37 @@
 
 .header-button-danger:hover {
   border-color: #9b1c1c;
+}
+
+.header-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.header-pdf:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.header-pdf:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.header-pdf svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
