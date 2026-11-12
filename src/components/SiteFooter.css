@@ -1,0 +1,50 @@
+/* Igual ao rodapé do portfólio */
+.site-footer {
+  margin-top: 24px;
+  padding: 40px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0a0a0a;
+  text-align: center;
+}
+
+.site-footer-signature {
+  margin-bottom: 16px;
+  color: #888888;
+  font-family: 'Abel', var(--font-body);
+  font-size: 16px;
+}
+
+.site-footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.site-footer-icons a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: #efc68a;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.site-footer-icons a:hover,
+.site-footer-icons a:focus-visible {
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+.site-footer-icons svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer-icons a {
+    transition: none;
+  }
+}

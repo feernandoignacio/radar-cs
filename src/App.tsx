@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ClientTable } from './components/ClientTable.tsx';
+import { ConfirmDialog } from './components/ConfirmDialog.tsx';
 import type { ContactPatch } from './components/ContactMenu.tsx';
 import { GoalCard } from './components/GoalCard.tsx';
 import { Header } from './components/Header.tsx';
 import { ImportPanel } from './components/ImportPanel.tsx';
 import { MessageEditor } from './components/MessageEditor.tsx';
 import { SendQueue, type Queue } from './components/SendQueue.tsx';
+import { SiteFooter } from './components/SiteFooter.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
 import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
@@ -43,6 +45,11 @@ function App() {
     savedBatch?.removedIds ?? [],
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  // Janela de confirmação aberta: excluir uma linha ou limpar tudo
+  const [confirm, setConfirm] = useState<
+    { kind: 'delete'; client: Client } | { kind: 'clear' } | null
+  >(null);
+  const closeConfirm = useCallback(() => setConfirm(null), []);
 
   const isSample = importedAt === null;
   const summary = getSummary(clients);
@@ -54,10 +61,15 @@ function App() {
       saveBatch(batch);
     }
   }, [importedAt, clients, removedIds]);
-  const visibleClients =
+  const filteredClients =
     filter === 'all'
       ? clients
       : clients.filter((client) => client.status === filter);
+  // Quem já teve a reunião realizada desce para o fim da lista
+  const visibleClients = [
+    ...filteredClients.filter((client) => client.status !== 'done'),
+    ...filteredClients.filter((client) => client.status === 'done'),
+  ];
 
   function handleStatusChange(id: string, status: Status) {
     setClients((prev) =>
@@ -137,10 +149,6 @@ function App() {
   }
 
   function handleClearData() {
-    const ok = window.confirm(
-      'Apagar o lote, os contatos digitados e o modelo de mensagem deste navegador? Isso não pode ser desfeito.',
-    );
-    if (!ok) return;
     clearAll();
     window.location.reload();
   }
@@ -208,8 +216,11 @@ function App() {
   }
 
   function handleDelete(client: Client) {
-    const name = client.company || 'esta linha sem nome';
-    if (!window.confirm(`Excluir ${name}?`)) return;
+    setConfirm({ kind: 'delete', client });
+  }
+
+  function confirmDelete(client: Client) {
+    setConfirm(null);
 
     setClients((prev) => prev.filter((item) => item.id !== client.id));
     setSelectedIds((prev) => {
@@ -261,148 +272,170 @@ function App() {
     : `Lote importado em ${formatDate(importedAt)}`;
 
   return (
-    <div className="app">
-      <Header
-        batchName={batchName}
-        total={summary.total}
-        inReview={summary.inReview}
-        onImportClick={() => setIsImportOpen(true)}
-        onClearClick={handleClearData}
-      />
-
-      {isSample && (
-        <p className="app-notice">
-          Você está vendo dados de exemplo. Clique em "Importar planilhas" para
-          usar o seu lote do mês.
-        </p>
-      )}
-
-      {importInfo && (
-        <p className="app-notice app-notice-success" role="status">
-          {importInfo}
-          <button
-            type="button"
-            aria-label="Fechar aviso"
-            onClick={() => setImportInfo('')}
-          >
-            ×
-          </button>
-        </p>
-      )}
-
-      <div className="app-summary">
-        <GoalCard summary={summary} />
-        <StatusCards summary={summary} />
-      </div>
-
-      <div className="app-main">
-        <section className="app-clients" aria-label="Clientes do lote">
-          <div className="app-clients-toolbar">
-            <StatusFilter
-              value={filter}
-              counts={summary.counts}
-              total={clients.length}
-              onChange={setFilter}
-            />
-            <div className="app-row-actions">
-              <button
-                type="button"
-                className="app-icon-button app-add-button"
-                aria-label="Adicionar linha"
-                title="Adicionar linha"
-                onClick={handleAddRow}
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className="app-icon-button app-delete-button"
-                aria-label="Excluir linha"
-                aria-pressed={isDeleting}
-                title="Excluir linha"
-                onClick={() => setIsDeleting((value) => !value)}
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className="app-send-button"
-                disabled={selectedIds.size === 0 || queue !== null}
-                onClick={handleStartQueue}
-              >
-                Enviar para {selectedIds.size}{' '}
-                {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
-              </button>
-            </div>
-          </div>
-
-          {isDeleting && (
-            <p className="app-delete-notice" role="status">
-              Clique na linha que deseja excluir.
-              <button type="button" onClick={() => setIsDeleting(false)}>
-                Cancelar
-              </button>
-            </p>
-          )}
-
-          <ClientTable
-            clients={visibleClients}
-            selectedIds={selectedIds}
-            onToggle={handleToggle}
-            onToggleAll={handleToggleAll}
-            onStatusChange={handleStatusChange}
-            onContactChange={handleContactChange}
-            onWhatsapp={handleWhatsapp}
-            onCompanyChange={handleCompanyChange}
-            onReasonChange={handleReasonChange}
-            isDeleting={isDeleting}
-            onDelete={handleDelete}
-          />
-
-          <p className="app-clients-footer">
-            Mostrando {visibleClients.length} de {clients.length}
-          </p>
-        </section>
-
-        <aside className="app-aside">
-          {queue && (
-            <SendQueue
-              queue={queue}
-              client={queueClient}
-              settings={settings}
-              onOpen={handleWhatsapp}
-              onNext={handleQueueNext}
-              onClose={handleQueueClose}
-            />
-          )}
-          <MessageEditor
-            settings={settings}
-            previewClient={visibleClients[0] ?? clients[0]}
-            onChange={handleSettingsChange}
-          />
-        </aside>
-      </div>
-
-      <footer className="app-footer">
-        <p>
-          Os dados ficam só neste navegador. Nada é enviado para servidores.
-        </p>
-      </footer>
-
-      {isImportOpen && (
-        <ImportPanel
-          previous={isSample ? [] : clients}
-          removedIds={removedIds}
-          hasSavedBatch={!isSample}
-          onClose={() => setIsImportOpen(false)}
-          onImport={handleImport}
+    <>
+      <div className="app">
+        <Header
+          batchName={batchName}
+          total={summary.total}
+          inReview={summary.inReview}
+          onImportClick={() => setIsImportOpen(true)}
+          onClearClick={() => setConfirm({ kind: 'clear' })}
         />
-      )}
-    </div>
+
+        {isSample && (
+          <p className="app-notice">
+            Você está vendo dados de exemplo. Clique em "Importar planilhas"
+            para usar o seu lote do mês.
+          </p>
+        )}
+
+        {importInfo && (
+          <p className="app-notice app-notice-success" role="status">
+            {importInfo}
+            <button
+              type="button"
+              aria-label="Fechar aviso"
+              onClick={() => setImportInfo('')}
+            >
+              ×
+            </button>
+          </p>
+        )}
+
+        <div className="app-summary">
+          <GoalCard summary={summary} />
+          <StatusCards summary={summary} />
+        </div>
+
+        <div className="app-main">
+          <section className="app-clients" aria-label="Clientes do lote">
+            <div className="app-clients-toolbar">
+              <StatusFilter
+                value={filter}
+                counts={summary.counts}
+                total={clients.length}
+                onChange={setFilter}
+              />
+              <div className="app-row-actions">
+                <button
+                  type="button"
+                  className="app-icon-button app-add-button"
+                  aria-label="Adicionar linha"
+                  title="Adicionar linha"
+                  onClick={handleAddRow}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="app-icon-button app-delete-button"
+                  aria-label="Excluir linha"
+                  aria-pressed={isDeleting}
+                  title="Excluir linha"
+                  onClick={() => setIsDeleting((value) => !value)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="app-send-button"
+                  disabled={selectedIds.size === 0 || queue !== null}
+                  onClick={handleStartQueue}
+                >
+                  Enviar para {selectedIds.size}{' '}
+                  {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
+                </button>
+              </div>
+            </div>
+
+            {isDeleting && (
+              <p className="app-delete-notice" role="status">
+                Clique na linha que deseja excluir.
+                <button type="button" onClick={() => setIsDeleting(false)}>
+                  Cancelar
+                </button>
+              </p>
+            )}
+
+            <ClientTable
+              clients={visibleClients}
+              selectedIds={selectedIds}
+              onToggle={handleToggle}
+              onToggleAll={handleToggleAll}
+              onStatusChange={handleStatusChange}
+              onContactChange={handleContactChange}
+              onWhatsapp={handleWhatsapp}
+              onCompanyChange={handleCompanyChange}
+              onReasonChange={handleReasonChange}
+              isDeleting={isDeleting}
+              onDelete={handleDelete}
+            />
+
+            <p className="app-clients-footer">
+              Mostrando {visibleClients.length} de {clients.length}
+            </p>
+          </section>
+
+          <aside className="app-aside">
+            {queue && (
+              <SendQueue
+                queue={queue}
+                client={queueClient}
+                settings={settings}
+                onOpen={handleWhatsapp}
+                onNext={handleQueueNext}
+                onClose={handleQueueClose}
+              />
+            )}
+            <MessageEditor
+              settings={settings}
+              previewClient={visibleClients[0] ?? clients[0]}
+              onChange={handleSettingsChange}
+            />
+          </aside>
+        </div>
+
+        <footer className="app-footer">
+          <p>
+            Os dados ficam só neste navegador. Nada é enviado para servidores.
+          </p>
+        </footer>
+
+        {isImportOpen && (
+          <ImportPanel
+            previous={isSample ? [] : clients}
+            removedIds={removedIds}
+            hasSavedBatch={!isSample}
+            onClose={() => setIsImportOpen(false)}
+            onImport={handleImport}
+          />
+        )}
+        {confirm?.kind === 'delete' && (
+          <ConfirmDialog
+            title="Excluir linha?"
+            message={`${confirm.client.company || 'Esta linha sem nome'} vai sair da lista. Isso não pode ser desfeito.`}
+            confirmLabel="Excluir"
+            onConfirm={() => confirmDelete(confirm.client)}
+            onCancel={closeConfirm}
+          />
+        )}
+
+        {confirm?.kind === 'clear' && (
+          <ConfirmDialog
+            title="Limpar todos os dados?"
+            message="O lote, os contatos digitados e o modelo de mensagem serão apagados deste navegador. Isso não pode ser desfeito."
+            confirmLabel="Limpar tudo"
+            onConfirm={handleClearData}
+            onCancel={closeConfirm}
+          />
+        )}
+      </div>
+      <SiteFooter />
+    </>
   );
 }
 
