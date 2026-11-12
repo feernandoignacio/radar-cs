@@ -1,0 +1,26 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 28px 32px 48px;
+}
+
+/* Meta ocupa mais espaço, cards ficam do lado. No celular, empilha. */
+.app-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .app {
+    padding: 20px 16px 40px;
+  }
+
+  .app-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,40 @@
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --border: #e3e6ea;
+  --border-strong: #d5d9df;
+  --text: #15181d;
+  --text-soft: #3a4049;
+  --text-muted: #5a616b;
+  --accent: #0e6b57;
+  --accent-soft: #f1f8f4;
+  --accent-border: #cfe7da;
+  --accent-text: #0b5a3b;
+  --warning-text: #8a3b12;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-title: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
