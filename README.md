@@ -1,5 +1,7 @@
 # Radar CS
 
+**Live:** https://radar-cs-delta.vercel.app
+
 Dashboard for Customer Success Managers to track the monthly batch of priority clients: who still needs contact, who has a meeting scheduled, and how close the month's goal is.
 
 Built to solve a real problem: the official dashboard only lists the batch and takes 24h to update, and the client data is spread across three spreadsheets, with the same company repeated many times.

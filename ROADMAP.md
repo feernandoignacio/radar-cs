@@ -8,7 +8,7 @@ Each part ends with the app running and one commit.
 - [x] **Part 4: contacts dropdown.** Arrow per company listing emails and company phone ("Telefone não encontrado" when missing), plus manual fields for contact name and WhatsApp number.
 - [x] **Part 5: WhatsApp.** Message template with variables, one-click button that opens WhatsApp Web with the text.
 - [x] **Part 6: send queue.** Send the same message to selected clients one by one.
-- [ ] **Part 7: polish + deploy.** Empty states, responsive check, deploy on Vercel.
+- [x] **Part 7: polish + deploy.** Empty states, responsive check, deploy on Vercel.
 
 ## Later
 
