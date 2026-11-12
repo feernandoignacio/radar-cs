@@ -11,7 +11,7 @@ Each part ends with the app running and one commit.
 - [x] **Part 7: polish + deploy.** Empty states, responsive check, deploy on Vercel.
 
 - [x] **Part 8: menus + new status.** Dropdowns styled like the Job Tracker language select, "Em análise" status (left out of the batch total and the goal), no company name on the page, current month in the header, clear data button next to import.
-- [ ] **Part 9: edit rows.** Editable reason, green plus to add a blank row, red trash to delete a row.
+- [x] **Part 9: edit rows.** Editable reason, green plus to add a blank row, red trash to delete a row.
 - [ ] **Part 10: PDF export.** Button next to the month that downloads the whole table as PDF.
 
 ## Later

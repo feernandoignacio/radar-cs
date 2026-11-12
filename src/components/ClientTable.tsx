@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { Client, Status } from '../types.ts';
 import { clientPhone } from '../utils/message.ts';
 import { ContactMenu, type ContactPatch } from './ContactMenu.tsx';
+import { EditableCell } from './EditableCell.tsx';
 import { StatusSelect } from './StatusSelect.tsx';
 import './ClientTable.css';
 
@@ -13,6 +14,11 @@ type ClientTableProps = {
   onStatusChange: (id: string, status: Status) => void;
   onContactChange: (id: string, patch: ContactPatch) => void;
   onWhatsapp: (client: Client) => void;
+  onCompanyChange: (id: string, company: string) => void;
+  onReasonChange: (id: string, reason: string) => void;
+  // Modo excluir: clicar numa linha apaga ela
+  isDeleting: boolean;
+  onDelete: (client: Client) => void;
 };
 
 export function ClientTable({
@@ -23,6 +29,10 @@ export function ClientTable({
   onStatusChange,
   onContactChange,
   onWhatsapp,
+  onCompanyChange,
+  onReasonChange,
+  isDeleting,
+  onDelete,
 }: ClientTableProps) {
   const selectAllRef = useRef<HTMLInputElement>(null);
   const selectedHere = clients.filter((client) =>
@@ -45,17 +55,21 @@ export function ClientTable({
 
   return (
     <div className="client-table-scroll">
-      <table className="client-table">
+      <table
+        className={isDeleting ? 'client-table is-deleting' : 'client-table'}
+      >
         <thead>
           <tr>
             <th className="client-table-check">
-              <input
-                ref={selectAllRef}
-                type="checkbox"
-                aria-label="Selecionar todos da lista"
-                checked={allSelected}
-                onChange={onToggleAll}
-              />
+              {!isDeleting && (
+                <input
+                  ref={selectAllRef}
+                  type="checkbox"
+                  aria-label="Selecionar todos da lista"
+                  checked={allSelected}
+                  onChange={onToggleAll}
+                />
+              )}
             </th>
             <th>Empresa</th>
             <th>Motivo do lote</th>
@@ -73,18 +87,53 @@ export function ClientTable({
               <tr
                 key={client.id}
                 className={isSelected ? 'is-selected' : undefined}
+                onClick={isDeleting ? () => onDelete(client) : undefined}
               >
                 <td className="client-table-check">
-                  <input
-                    type="checkbox"
-                    aria-label={`Selecionar ${client.company}`}
-                    checked={isSelected}
-                    onChange={() => onToggle(client.id)}
-                  />
+                  {isDeleting ? (
+                    <button
+                      type="button"
+                      className="row-delete-button"
+                      aria-label={`Excluir ${client.company || 'linha sem nome'}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onDelete(client);
+                      }}
+                    >
+                      ×
+                    </button>
+                  ) : (
+                    <input
+                      type="checkbox"
+                      aria-label={`Selecionar ${client.company || 'linha sem nome'}`}
+                      checked={isSelected}
+                      onChange={() => onToggle(client.id)}
+                    />
+                  )}
                 </td>
-                <td className="client-table-company">{client.company}</td>
+                <td className="client-table-company">
+                  {/* Empresa só é editável na linha nova, até ser preenchida */}
+                  {client.company ? (
+                    client.company
+                  ) : (
+                    <EditableCell
+                      value=""
+                      label="Nome da empresa"
+                      placeholder="Nome da empresa"
+                      autoFocus
+                      onCommit={(company) => {
+                        if (company) onCompanyChange(client.id, company);
+                      }}
+                    />
+                  )}
+                </td>
                 <td className="client-table-reason">
-                  {client.reason || 'Sem motivo na planilha'}
+                  <EditableCell
+                    value={client.reason}
+                    label={`Motivo de ${client.company || 'linha nova'}`}
+                    placeholder="Adicionar motivo"
+                    onCommit={(reason) => onReasonChange(client.id, reason)}
+                  />
                 </td>
                 <td>
                   <ContactMenu

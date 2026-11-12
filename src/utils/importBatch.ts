@@ -37,6 +37,7 @@ type ImportInput = {
   reasons: SheetRow[];
   contacts: SheetRow[];
   previous: Client[];
+  removedIds: string[];
   // false = novo mês, todo mundo começa em "Não tentou ainda"
   keepStatus: boolean;
 };
@@ -46,6 +47,7 @@ export function buildClients({
   reasons,
   contacts,
   previous,
+  removedIds,
   keepStatus,
 }: ImportInput): Client[] {
   // Motivos por empresa. Uma empresa pode ter mais de um CTA.
@@ -98,7 +100,8 @@ export function buildClients({
 
   const previousById = new Map(previous.map((client) => [client.id, client]));
   const clients: Client[] = [];
-  const seenIds = new Set<string>();
+  // No "novo mês" as exclusões antigas não valem mais
+  const seenIds = new Set<string>(keepStatus ? removedIds : []);
 
   for (const row of batch) {
     const id = column(row, 'Company Customer ID');
@@ -115,7 +118,12 @@ export function buildClients({
       id,
       company,
       document: column(row, 'Company Document Number'),
-      reason: [...(reasonsByCompany.get(key) ?? [])].join(' · '),
+      // Motivo editado à mão vale mais que o da planilha
+      reason:
+        keepStatus && old?.reasonEdited
+          ? old.reason
+          : [...(reasonsByCompany.get(key) ?? [])].join(' · '),
+      reasonEdited: keepStatus && old?.reasonEdited ? true : undefined,
       emails: [...(found?.emails ?? [])].sort(),
       companyPhone: found?.phone ?? '',
       // O que ela digitou à mão nunca se perde numa nova importação
@@ -124,6 +132,12 @@ export function buildClients({
       status: keepStatus && old ? old.status : 'not_tried',
       lastAction: keepStatus && old ? old.lastAction : 'Nenhuma',
     });
+  }
+
+  // Ao atualizar o lote, as linhas criadas à mão continuam no topo
+  if (keepStatus) {
+    const manual = previous.filter((client) => client.isManual);
+    return [...manual, ...clients];
   }
 
   return clients;

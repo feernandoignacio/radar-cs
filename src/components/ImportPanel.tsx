@@ -12,9 +12,10 @@ type LoadedFile = { name: string; rows: SheetRow[] };
 
 type ImportPanelProps = {
   previous: Client[];
+  removedIds: string[];
   hasSavedBatch: boolean;
   onClose: () => void;
-  onImport: (clients: Client[]) => void;
+  onImport: (clients: Client[], keepStatus: boolean) => void;
 };
 
 const FILE_LABELS: Record<FileKind, { title: string; hint: string }> = {
@@ -36,6 +37,7 @@ const KINDS: FileKind[] = ['batch', 'reasons', 'contacts'];
 
 export function ImportPanel({
   previous,
+  removedIds,
   hasSavedBatch,
   onClose,
   onImport,
@@ -88,6 +90,7 @@ export function ImportPanel({
       reasons: files.reasons?.rows ?? [],
       contacts: files.contacts?.rows ?? [],
       previous,
+      removedIds,
       keepStatus,
     });
     // Não troca o lote atual por um vazio
@@ -97,7 +100,7 @@ export function ImportPanel({
       );
       return;
     }
-    onImport(clients);
+    onImport(clients, keepStatus);
   }
 
   return (

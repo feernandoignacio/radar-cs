@@ -1,0 +1,28 @@
+/* Parece texto comum; a borda só aparece ao passar o mouse ou editar */
+.editable-cell {
+  width: 100%;
+  min-width: 140px;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-overflow: ellipsis;
+}
+
+.editable-cell:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.editable-cell:focus {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-border);
+  background: var(--surface);
+}
+
+.editable-cell::placeholder {
+  color: #a3a9b1;
+}

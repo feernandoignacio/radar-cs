@@ -49,6 +49,83 @@
   border-bottom: 1px solid var(--border);
 }
 
+.app-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.app-icon-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.app-icon-button svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* + verde */
+.app-add-button {
+  border: 1px solid #bfe3d2;
+  background: #e8f6ef;
+  color: #128a5c;
+}
+
+.app-add-button:hover {
+  background: #d3eee1;
+}
+
+/* Lixeira vermelha; fica cheia quando o modo excluir está ligado */
+.app-delete-button {
+  border: 1px solid #f5c2bf;
+  background: #fdecea;
+  color: #c62828;
+}
+
+.app-delete-button:hover {
+  background: #fbd9d6;
+}
+
+.app-delete-button[aria-pressed='true'] {
+  border-color: #c62828;
+  background: #c62828;
+  color: #ffffff;
+}
+
+.app-delete-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f5c2bf;
+  background: #fdecea;
+  color: #9b1c1c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.app-delete-notice button {
+  padding: 6px 12px;
+  border: 1px solid #c62828;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #9b1c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .app-send-button {
   height: 44px;
   padding: 0 18px;

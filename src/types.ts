@@ -26,9 +26,15 @@ export type Client = {
   status: Status;
   // Texto curto da última ação, ex: "Status alterado em 12/11"
   lastAction: string;
+  // Linha criada à mão pelo botão +
+  isManual?: boolean;
+  // Motivo alterado à mão (não é sobrescrito ao atualizar o lote)
+  reasonEdited?: boolean;
 };
 
 export type Batch = {
   importedAt: string;
   clients: Client[];
+  // Linhas excluídas, para não voltarem ao atualizar o lote
+  removedIds?: string[];
 };

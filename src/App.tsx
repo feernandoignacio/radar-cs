@@ -39,6 +39,10 @@ function App() {
   const [queue, setQueue] = useState<Queue | null>(null);
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [removedIds, setRemovedIds] = useState<string[]>(
+    savedBatch?.removedIds ?? [],
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isSample = importedAt === null;
   const summary = getSummary(clients);
@@ -46,10 +50,10 @@ function App() {
   // Toda mudança no lote importado fica salva no navegador
   useEffect(() => {
     if (importedAt) {
-      const batch: Batch = { importedAt, clients };
+      const batch: Batch = { importedAt, clients, removedIds };
       saveBatch(batch);
     }
-  }, [importedAt, clients]);
+  }, [importedAt, clients, removedIds]);
   const visibleClients =
     filter === 'all'
       ? clients
@@ -183,7 +187,62 @@ function App() {
     });
   }
 
-  function handleImport(imported: Client[]) {
+  // Linha nova, toda em branco, no topo da tabela
+  function handleAddRow() {
+    const client: Client = {
+      id: `manual-${Date.now()}`,
+      company: '',
+      document: '',
+      reason: '',
+      emails: [],
+      companyPhone: '',
+      contactName: '',
+      whatsapp: '',
+      status: 'not_tried',
+      lastAction: `Criada em ${today()}`,
+      isManual: true,
+    };
+    setClients((prev) => [client, ...prev]);
+    setFilter('all');
+    setIsDeleting(false);
+  }
+
+  function handleDelete(client: Client) {
+    const name = client.company || 'esta linha sem nome';
+    if (!window.confirm(`Excluir ${name}?`)) return;
+
+    setClients((prev) => prev.filter((item) => item.id !== client.id));
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(client.id);
+      return next;
+    });
+    // Linhas importadas ficam anotadas para não voltarem ao atualizar o lote
+    if (!client.isManual) {
+      setRemovedIds((prev) => [...prev, client.id]);
+    }
+    setIsDeleting(false);
+  }
+
+  function handleCompanyChange(id: string, company: string) {
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === id ? { ...client, company } : client,
+      ),
+    );
+  }
+
+  function handleReasonChange(id: string, reason: string) {
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === id ? { ...client, reason, reasonEdited: true } : client,
+      ),
+    );
+  }
+
+  function handleImport(imported: Client[], keepStatus: boolean) {
+    if (!keepStatus) setRemovedIds([]);
+    setIsDeleting(false);
     setClients(imported);
     setImportedAt(new Date().toISOString());
     setSelectedIds(new Set());
@@ -245,16 +304,50 @@ function App() {
               total={clients.length}
               onChange={setFilter}
             />
-            <button
-              type="button"
-              className="app-send-button"
-              disabled={selectedIds.size === 0 || queue !== null}
-              onClick={handleStartQueue}
-            >
-              Enviar para {selectedIds.size}{' '}
-              {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
-            </button>
+            <div className="app-row-actions">
+              <button
+                type="button"
+                className="app-icon-button app-add-button"
+                aria-label="Adicionar linha"
+                title="Adicionar linha"
+                onClick={handleAddRow}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="app-icon-button app-delete-button"
+                aria-label="Excluir linha"
+                aria-pressed={isDeleting}
+                title="Excluir linha"
+                onClick={() => setIsDeleting((value) => !value)}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="app-send-button"
+                disabled={selectedIds.size === 0 || queue !== null}
+                onClick={handleStartQueue}
+              >
+                Enviar para {selectedIds.size}{' '}
+                {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
+              </button>
+            </div>
           </div>
+
+          {isDeleting && (
+            <p className="app-delete-notice" role="status">
+              Clique na linha que deseja excluir.
+              <button type="button" onClick={() => setIsDeleting(false)}>
+                Cancelar
+              </button>
+            </p>
+          )}
 
           <ClientTable
             clients={visibleClients}
@@ -264,6 +357,10 @@ function App() {
             onStatusChange={handleStatusChange}
             onContactChange={handleContactChange}
             onWhatsapp={handleWhatsapp}
+            onCompanyChange={handleCompanyChange}
+            onReasonChange={handleReasonChange}
+            isDeleting={isDeleting}
+            onDelete={handleDelete}
           />
 
           <p className="app-clients-footer">
@@ -299,6 +396,7 @@ function App() {
       {isImportOpen && (
         <ImportPanel
           previous={isSample ? [] : clients}
+          removedIds={removedIds}
           hasSavedBatch={!isSample}
           onClose={() => setIsImportOpen(false)}
           onImport={handleImport}
