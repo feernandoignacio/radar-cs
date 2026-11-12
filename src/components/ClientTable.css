@@ -52,6 +52,33 @@
   color: var(--text-muted);
 }
 
+.client-table .client-table-actions {
+  padding-right: 20px;
+  text-align: right;
+}
+
+.whatsapp-button {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #bfe3d2;
+  border-radius: 10px;
+  background: #e8f6ef;
+  color: #0e6b47;
+}
+
+.whatsapp-button:hover:not(:disabled) {
+  background: #d3eee1;
+}
+
+.whatsapp-button:disabled {
+  border-color: var(--border);
+  background: var(--bg);
+  color: #a3a9b1;
+  cursor: not-allowed;
+}
+
 .client-table tr.is-selected td {
   background: #f7fbf9;
 }

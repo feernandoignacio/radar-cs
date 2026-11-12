@@ -15,7 +15,24 @@
   gap: 16px;
 }
 
+/* Tabela ocupa o espaço, a lateral desce para baixo em telas menores */
+.app-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.app-aside {
+  display: flex;
+  flex: 1 1 340px;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
 .app-clients {
+  flex: 999 1 640px;
   min-width: 0;
   border: 1px solid var(--border);
   border-radius: 16px;

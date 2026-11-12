@@ -4,11 +4,23 @@ import type { ContactPatch } from './components/ContactMenu.tsx';
 import { GoalCard } from './components/GoalCard.tsx';
 import { Header } from './components/Header.tsx';
 import { ImportPanel } from './components/ImportPanel.tsx';
+import { MessageEditor } from './components/MessageEditor.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
 import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
 import type { Batch, Client, Status } from './types.ts';
-import { loadBatch, saveBatch } from './utils/storage.ts';
+import {
+  clientPhone,
+  fillTemplate,
+  whatsappUrl,
+  type MessageSettings,
+} from './utils/message.ts';
+import {
+  loadBatch,
+  loadSettings,
+  saveBatch,
+  saveSettings,
+} from './utils/storage.ts';
 import { getSummary } from './utils/summary.ts';
 import './App.css';
 
@@ -21,6 +33,7 @@ function App() {
   );
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importInfo, setImportInfo] = useState('');
+  const [settings, setSettings] = useState(loadSettings);
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -45,6 +58,33 @@ function App() {
         client.id === id
           ? { ...client, status, lastAction: `Status alterado em ${today()}` }
           : client,
+      ),
+    );
+  }
+
+  function handleSettingsChange(next: MessageSettings) {
+    setSettings(next);
+    saveSettings(next);
+  }
+
+  // Abre o WhatsApp Web com a mensagem pronta. Ela só aperta enviar.
+  function handleWhatsapp(client: Client) {
+    const phone = clientPhone(client);
+    if (!phone) return;
+    const text = fillTemplate(settings.template, client, settings);
+    // Nome fixo da janela: reaproveita a mesma aba do WhatsApp
+    window.open(whatsappUrl(phone, text), 'radar-cs-whatsapp');
+
+    // Quem ainda não tinha sido procurado passa para "Tentou, sem sucesso"
+    setClients((prev) =>
+      prev.map((item) =>
+        item.id === client.id
+          ? {
+              ...item,
+              status: item.status === 'not_tried' ? 'tried' : item.status,
+              lastAction: `WhatsApp em ${today()}`,
+            }
+          : item,
       ),
     );
   }
@@ -138,38 +178,49 @@ function App() {
         <StatusCards summary={summary} />
       </div>
 
-      <section className="app-clients" aria-label="Clientes do lote">
-        <div className="app-clients-toolbar">
-          <StatusFilter
-            value={filter}
-            counts={summary.counts}
-            total={summary.total}
-            onChange={setFilter}
+      <div className="app-main">
+        <section className="app-clients" aria-label="Clientes do lote">
+          <div className="app-clients-toolbar">
+            <StatusFilter
+              value={filter}
+              counts={summary.counts}
+              total={summary.total}
+              onChange={setFilter}
+            />
+            {/* O envio em fila ganha função na parte 5 */}
+            <button
+              type="button"
+              className="app-send-button"
+              disabled={selectedIds.size === 0}
+            >
+              Enviar para {selectedIds.size}{' '}
+              {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
+            </button>
+          </div>
+
+          <ClientTable
+            clients={visibleClients}
+            selectedIds={selectedIds}
+            onToggle={handleToggle}
+            onToggleAll={handleToggleAll}
+            onStatusChange={handleStatusChange}
+            onContactChange={handleContactChange}
+            onWhatsapp={handleWhatsapp}
           />
-          {/* O envio em fila ganha função na parte 5 */}
-          <button
-            type="button"
-            className="app-send-button"
-            disabled={selectedIds.size === 0}
-          >
-            Enviar para {selectedIds.size}{' '}
-            {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
-          </button>
-        </div>
 
-        <ClientTable
-          clients={visibleClients}
-          selectedIds={selectedIds}
-          onToggle={handleToggle}
-          onToggleAll={handleToggleAll}
-          onStatusChange={handleStatusChange}
-          onContactChange={handleContactChange}
-        />
+          <p className="app-clients-footer">
+            Mostrando {visibleClients.length} de {summary.total}
+          </p>
+        </section>
 
-        <p className="app-clients-footer">
-          Mostrando {visibleClients.length} de {summary.total}
-        </p>
-      </section>
+        <aside className="app-aside">
+          <MessageEditor
+            settings={settings}
+            previewClient={visibleClients[0] ?? clients[0]}
+            onChange={handleSettingsChange}
+          />
+        </aside>
+      </div>
 
       {isImportOpen && (
         <ImportPanel
