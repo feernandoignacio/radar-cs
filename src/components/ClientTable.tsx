@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { Client, Status } from '../types.ts';
+import { ContactMenu, type ContactPatch } from './ContactMenu.tsx';
 import { StatusSelect } from './StatusSelect.tsx';
 import './ClientTable.css';
 
@@ -9,6 +10,7 @@ type ClientTableProps = {
   onToggle: (id: string) => void;
   onToggleAll: () => void;
   onStatusChange: (id: string, status: Status) => void;
+  onContactChange: (id: string, patch: ContactPatch) => void;
 };
 
 export function ClientTable({
@@ -17,6 +19,7 @@ export function ClientTable({
   onToggle,
   onToggleAll,
   onStatusChange,
+  onContactChange,
 }: ClientTableProps) {
   const selectAllRef = useRef<HTMLInputElement>(null);
   const selectedHere = clients.filter((client) =>
@@ -79,19 +82,11 @@ export function ClientTable({
                 <td className="client-table-reason">
                   {client.reason || 'Sem motivo na planilha'}
                 </td>
-                {/* Na parte 4 vira a setinha com a lista de contatos */}
                 <td>
-                  <span className="client-table-contacts">
-                    <span>
-                      {client.emails.length}{' '}
-                      {client.emails.length === 1 ? 'email' : 'emails'}
-                    </span>
-                    <small
-                      className={client.companyPhone ? undefined : 'is-missing'}
-                    >
-                      {client.companyPhone || 'Telefone não encontrado'}
-                    </small>
-                  </span>
+                  <ContactMenu
+                    client={client}
+                    onSave={(patch) => onContactChange(client.id, patch)}
+                  />
                 </td>
                 <td>
                   <StatusSelect

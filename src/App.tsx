@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ClientTable } from './components/ClientTable.tsx';
+import type { ContactPatch } from './components/ContactMenu.tsx';
 import { GoalCard } from './components/GoalCard.tsx';
 import { Header } from './components/Header.tsx';
 import { ImportPanel } from './components/ImportPanel.tsx';
@@ -44,6 +45,14 @@ function App() {
         client.id === id
           ? { ...client, status, lastAction: `Status alterado em ${today()}` }
           : client,
+      ),
+    );
+  }
+
+  function handleContactChange(id: string, patch: ContactPatch) {
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === id ? { ...client, ...patch } : client,
       ),
     );
   }
@@ -154,6 +163,7 @@ function App() {
           onToggle={handleToggle}
           onToggleAll={handleToggleAll}
           onStatusChange={handleStatusChange}
+          onContactChange={handleContactChange}
         />
 
         <p className="app-clients-footer">

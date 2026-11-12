@@ -1,0 +1,185 @@
+.contact-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  max-width: 260px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+}
+
+.contact-button:hover,
+.contact-button[aria-expanded='true'] {
+  border-color: var(--text-muted);
+}
+
+.contact-button-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.contact-button-title {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-button small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.contact-button small.is-missing {
+  color: #9b1c1c;
+}
+
+.contact-button small.is-whatsapp {
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+/* Setinha que gira quando abre, igual ao seletor de idiomas */
+.contact-arrow {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.contact-button[aria-expanded='true'] .contact-arrow {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.contact-menu {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(21, 24, 29, 0.16);
+  font-size: 13px;
+}
+
+.contact-section {
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.contact-form input {
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.contact-form input:focus {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-border);
+}
+
+.contact-save {
+  height: 40px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.contact-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.contact-emails {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-emails li + li {
+  border-top: 1px solid #eceef1;
+}
+
+.contact-email {
+  overflow: hidden;
+  min-width: 0;
+  color: var(--text-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-link {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.contact-link:hover {
+  background: var(--accent-soft);
+}
+
+.contact-missing {
+  color: #9b1c1c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-arrow {
+    transition: none;
+  }
+}
