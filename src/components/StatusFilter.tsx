@@ -19,6 +19,7 @@ const SHORT_LABELS: Record<Status, string> = {
   scheduled: 'Agendada',
   done: 'Realizada',
   opted_out: 'Não quer contato',
+  in_review: 'Em análise',
 };
 
 export function StatusFilter({

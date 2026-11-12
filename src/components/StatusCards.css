@@ -69,3 +69,8 @@
   font-size: 12px;
   color: var(--text-soft);
 }
+
+.status-card-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+}

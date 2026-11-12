@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS: MessageSettings = {
   myName: '',
   scheduleLink: '',
   template:
-    'Oi {contato}, tudo bem? Aqui é a {meu_nome}, do time de CS da RD Station. ' +
+    'Oi {contato}, tudo bem? Aqui é a {meu_nome}, do time de Customer Success. ' +
     'Cuido da conta da {empresa} e queria marcar uma conversa rápida para ver ' +
     'como estão os resultados. Pode escolher o melhor horário por aqui: {link_agenda}',
 };

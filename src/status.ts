@@ -15,6 +15,7 @@ export const STATUS_ORDER: Status[] = [
   'scheduled',
   'done',
   'opted_out',
+  'in_review',
 ];
 
 export const STATUS_INFO: Record<Status, StatusInfo> = {
@@ -47,5 +48,11 @@ export const STATUS_INFO: Record<Status, StatusInfo> = {
     dot: '#D93A3A',
     pillBg: '#FDE4E2',
     pillText: '#9B1C1C',
+  },
+  in_review: {
+    label: 'Em análise',
+    dot: '#2F6FDB',
+    pillBg: '#E2EEFF',
+    pillText: '#1D4B9E',
   },
 };

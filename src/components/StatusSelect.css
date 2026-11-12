@@ -1,30 +1,28 @@
-.status-select {
-  height: 32px;
-  padding: 0 28px 0 12px;
+/* Etiqueta colorida com o triângulo ao lado */
+.status-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 5px 10px 5px 12px;
   border: 0;
-  border-radius: 16px;
-  font: inherit;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  appearance: none;
-  /* Setinha desenhada com CSS, na cor do texto */
-  background-image:
-    linear-gradient(45deg, transparent 50%, currentColor 50%),
-    linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position:
-    right 14px center,
-    right 10px center;
-  background-size: 4px 4px;
-  background-repeat: no-repeat;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.status-select:focus-visible {
+.status-trigger:hover {
+  filter: brightness(0.96);
+}
+
+.status-trigger:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.status-select option {
-  background: #ffffff;
-  color: var(--text);
+.status-options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

@@ -1,0 +1,96 @@
+/* Estilo compartilhado pelos menus (status e contatos),
+   igual ao seletor de idiomas do Job Tracker */
+
+/* Triângulo feito com bordas; gira quando o menu está aberto */
+.menu-arrow {
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-top: 5px solid currentColor;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  transition: transform 0.15s;
+}
+
+[aria-expanded='true'] > .menu-arrow {
+  transform: rotate(180deg);
+}
+
+/* O cartão: branco, cantos arredondados e sombra suave */
+.floating-menu {
+  position: fixed;
+  z-index: 20;
+  overflow-y: auto;
+  margin: 0;
+  padding: 8px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(15, 39, 51, 0.16);
+  list-style: none;
+  animation: floating-menu-in 0.12s ease-out;
+}
+
+.menu-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.menu-option:hover,
+.menu-option:focus-visible {
+  outline: none;
+  background: #f1f5f7;
+}
+
+.menu-option.selected {
+  color: var(--accent);
+}
+
+.menu-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.menu-check {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes floating-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-arrow {
+    transition: none;
+  }
+
+  .floating-menu {
+    animation: none;
+  }
+}

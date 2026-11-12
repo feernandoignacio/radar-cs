@@ -37,6 +37,19 @@
   color: var(--text-muted);
 }
 
+.header-month {
+  margin-top: 4px;
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .header-button {
   height: 44px;
   padding: 0 16px;
@@ -50,4 +63,12 @@
 
 .header-button:hover {
   border-color: var(--text-muted);
+}
+
+.header-button-danger {
+  color: #9b1c1c;
+}
+
+.header-button-danger:hover {
+  border-color: #9b1c1c;
 }

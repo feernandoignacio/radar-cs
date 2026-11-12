@@ -18,7 +18,7 @@ export function GoalCard({ summary }: GoalCardProps) {
           Meta do mês: 50% de reuniões realizadas
         </h2>
         <span className="goal-note">
-          Atualiza na hora · no sistema da RD leva 24h
+          Atualiza na hora · no sistema oficial leva 24h
         </span>
       </div>
 

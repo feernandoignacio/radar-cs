@@ -1,14 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type FormEvent,
-} from 'react';
+import { useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { useClickOutside } from '../hooks/useClickOutside.ts';
+import { useFloatingMenu } from '../hooks/useFloatingMenu.ts';
 import type { Client } from '../types.ts';
+import './FloatingMenu.css';
 import './ContactMenu.css';
 
 export type ContactPatch = Pick<Client, 'contactName' | 'whatsapp'>;
@@ -18,79 +12,26 @@ type ContactMenuProps = {
   onSave: (patch: ContactPatch) => void;
 };
 
-const MENU_WIDTH = 340;
-
 export function ContactMenu({ client, onSave }: ContactMenuProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState<CSSProperties>({});
+  const { isOpen, toggle, close, triggerRef, menuRef, style } =
+    useFloatingMenu(340);
   const [name, setName] = useState(client.contactName);
   const [whatsapp, setWhatsapp] = useState(client.whatsapp);
   const [copied, setCopied] = useState('');
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [refs] = useState(() => [buttonRef, menuRef]);
-
-  const close = useCallback(() => setIsOpen(false), []);
-  useClickOutside(refs, close, isOpen);
-
-  // O menu fica num portal para não ser cortado pela rolagem da tabela.
-  // Por isso a posição é calculada a partir do botão.
-  const updatePosition = useCallback(() => {
-    const rect = buttonRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const left = Math.max(
-      Math.min(rect.left, window.innerWidth - MENU_WIDTH - 12),
-      12,
-    );
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
-
-    // Se não cabe embaixo, abre para cima
-    if (spaceBelow < 320 && spaceAbove > spaceBelow) {
-      setPosition({
-        left,
-        bottom: window.innerHeight - rect.top + 6,
-        maxHeight: spaceAbove - 18,
-      });
-    } else {
-      setPosition({ left, top: rect.bottom + 6, maxHeight: spaceBelow - 18 });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-        buttonRef.current?.focus();
-      }
-    }
-
-    window.addEventListener('scroll', updatePosition, true);
-    window.addEventListener('resize', updatePosition);
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      window.removeEventListener('scroll', updatePosition, true);
-      window.removeEventListener('resize', updatePosition);
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [isOpen, updatePosition]);
 
   function handleToggle() {
     if (!isOpen) {
       // Abre sempre com os valores salvos
       setName(client.contactName);
       setWhatsapp(client.whatsapp);
-      updatePosition();
     }
-    setIsOpen((open) => !open);
+    toggle();
   }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     onSave({ contactName: name.trim(), whatsapp: whatsapp.trim() });
-    setIsOpen(false);
+    close();
   }
 
   async function handleCopy(email: string) {
@@ -110,12 +51,12 @@ export function ContactMenu({ client, onSave }: ContactMenuProps) {
   return (
     <>
       <button
-        ref={buttonRef}
+        ref={triggerRef}
         type="button"
         className="contact-button"
         aria-expanded={isOpen}
         aria-controls={menuId}
-        aria-label={`Contatos de ${client.company}`}
+        aria-label={`Contatos de ${client.company || 'nova empresa'}`}
         onClick={handleToggle}
       >
         <span className="contact-button-texts">
@@ -130,7 +71,7 @@ export function ContactMenu({ client, onSave }: ContactMenuProps) {
               : phone || 'Telefone não encontrado'}
           </small>
         </span>
-        <span className="contact-arrow" aria-hidden="true" />
+        <span className="menu-arrow" aria-hidden="true" />
       </button>
 
       {isOpen &&
@@ -138,8 +79,8 @@ export function ContactMenu({ client, onSave }: ContactMenuProps) {
           <div
             ref={menuRef}
             id={menuId}
-            className="contact-menu"
-            style={{ ...position, width: MENU_WIDTH }}
+            className="floating-menu contact-menu"
+            style={style}
           >
             <form className="contact-form" onSubmit={handleSubmit}>
               <p className="contact-section">Contato principal</p>

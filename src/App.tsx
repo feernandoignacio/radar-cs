@@ -206,7 +206,9 @@ function App() {
       <Header
         batchName={batchName}
         total={summary.total}
+        inReview={summary.inReview}
         onImportClick={() => setIsImportOpen(true)}
+        onClearClick={handleClearData}
       />
 
       {isSample && (
@@ -240,7 +242,7 @@ function App() {
             <StatusFilter
               value={filter}
               counts={summary.counts}
-              total={summary.total}
+              total={clients.length}
               onChange={setFilter}
             />
             <button
@@ -265,7 +267,7 @@ function App() {
           />
 
           <p className="app-clients-footer">
-            Mostrando {visibleClients.length} de {summary.total}
+            Mostrando {visibleClients.length} de {clients.length}
           </p>
         </section>
 
@@ -292,11 +294,6 @@ function App() {
         <p>
           Os dados ficam só neste navegador. Nada é enviado para servidores.
         </p>
-        {!isSample && (
-          <button type="button" onClick={handleClearData}>
-            Apagar dados deste navegador
-          </button>
-        )}
       </footer>
 
       {isImportOpen && (

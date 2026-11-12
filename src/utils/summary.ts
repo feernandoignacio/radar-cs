@@ -1,11 +1,13 @@
 import { STATUS_ORDER } from '../status.ts';
 import type { Client, Status } from '../types.ts';
 
-// Meta da RD: 50% do lote com reunião realizada
+// Meta: 50% do lote com reunião realizada
 export const GOAL_RATE = 0.5;
 
 export type Summary = {
+  // Total que conta para a meta (sem os "Em análise")
   total: number;
+  inReview: number;
   counts: Record<Status, number>;
   goal: number;
   forecast: number;
@@ -22,13 +24,15 @@ export function getSummary(clients: Client[]): Summary {
     counts[client.status] += 1;
   }
 
-  const total = clients.length;
+  // Quem está "Em análise" não entra no lote nem na meta
+  const total = clients.length - counts.in_review;
   const goal = Math.ceil(total * GOAL_RATE);
   // Previsão de fechamento = realizadas + agendadas
   const forecast = counts.done + counts.scheduled;
 
   return {
     total,
+    inReview: counts.in_review,
     counts,
     goal,
     forecast,

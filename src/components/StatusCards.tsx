@@ -41,13 +41,19 @@ export function StatusCards({ summary }: StatusCardsProps) {
         </span>
       </div>
 
-      <div className="status-card status-card-wide">
-        <span className="status-card-label">
-          <i style={{ background: STATUS_INFO.opted_out.dot }} />
-          {STATUS_INFO.opted_out.label}
-        </span>
-        <span className="status-card-number">{counts.opted_out}</span>
-      </div>
+      {/* Os dois que ficam fora do andamento normal, lado a lado */}
+      {(['opted_out', 'in_review'] as Status[]).map((status) => (
+        <div key={status} className="status-card">
+          <span className="status-card-label">
+            <i style={{ background: STATUS_INFO[status].dot }} />
+            {STATUS_INFO[status].label}
+          </span>
+          <span className="status-card-number">{counts[status]}</span>
+          {status === 'in_review' && (
+            <small className="status-card-hint">Fora da meta</small>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

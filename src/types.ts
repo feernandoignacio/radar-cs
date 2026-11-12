@@ -1,8 +1,15 @@
 // Situação de cada cliente do lote
-export type Status = 'not_tried' | 'tried' | 'scheduled' | 'done' | 'opted_out';
+export type Status =
+  | 'not_tried'
+  | 'tried'
+  | 'scheduled'
+  | 'done'
+  | 'opted_out'
+  // Em análise: fica fora da conta do lote e da meta
+  | 'in_review';
 
 export type Client = {
-  // ID do cliente na RD (Company Customer ID), vem do lote
+  // ID do cliente (Company Customer ID), vem do lote
   id: string;
   company: string;
   // CNPJ
