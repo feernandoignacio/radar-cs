@@ -13,7 +13,7 @@ Each part ends with the app running and one commit.
 - [x] **Part 8: menus + new status.** Dropdowns styled like the Job Tracker language select, "Em análise" status (left out of the batch total and the goal), no company name on the page, current month in the header, clear data button next to import.
 - [x] **Part 9: edit rows.** Editable reason, green plus to add a blank row, red trash to delete a row.
 - [x] **Extras.** Clients with a done meeting move to the bottom, styled confirm dialog, footer like the portfolio.
-- [x] **Part 10: PDF export.** Button next to the month that downloads the whole table as PDF.
+- [x] **Part 10: PDF export.** Button next to the month. The PDF is a snapshot of the page without buttons, filters and the message editor, laid out for landscape A4, never splitting a row across pages.
 
 ## Later
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ClientTable } from './components/ClientTable.tsx';
 import { ConfirmDialog } from './components/ConfirmDialog.tsx';
 import type { ContactPatch } from './components/ContactMenu.tsx';
@@ -25,7 +25,7 @@ import {
   saveBatch,
   saveSettings,
 } from './utils/storage.ts';
-import { currentMonth } from './utils/date.ts';
+import { monthSlug } from './utils/date.ts';
 import { exportPdf } from './utils/exportPdf.ts';
 import { getSummary } from './utils/summary.ts';
 import './App.css';
@@ -53,6 +53,8 @@ function App() {
   >(null);
   const closeConfirm = useCallback(() => setConfirm(null), []);
   const [isExporting, setIsExporting] = useState(false);
+  // Área da página que vira o PDF (tudo, menos o modelo de mensagem)
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const isSample = importedAt === null;
   const summary = getSummary(clients);
@@ -152,10 +154,21 @@ function App() {
   }
 
   async function handlePdf() {
+    if (!pageRef.current) return;
+    const previousFilter = filter;
     setIsExporting(true);
+    setIsDeleting(false);
+    // O PDF sai com todos os clientes, mesmo se tiver um filtro ligado
+    setFilter('all');
+
     try {
-      await exportPdf({ clients, month: currentMonth(), batchName });
+      // Espera a tela redesenhar sem o filtro antes de tirar a foto
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      );
+      await exportPdf(pageRef.current, `radar-cs-${monthSlug()}.pdf`);
     } finally {
+      setFilter(previousFilter);
       setIsExporting(false);
     }
   }
@@ -284,7 +297,7 @@ function App() {
     : `Lote importado em ${formatDate(importedAt)}`;
 
   return (
-    <>
+    <div ref={pageRef} className="app-page">
       <div className="app">
         <Header
           batchName={batchName}
@@ -323,6 +336,11 @@ function App() {
 
         <div className="app-main">
           <section className="app-clients" aria-label="Clientes do lote">
+            {/* Só aparece no PDF, no lugar da barra de filtros */}
+            <h2 className="pdf-only app-clients-title">
+              Clientes do lote · {clients.length}
+            </h2>
+
             <div className="app-clients-toolbar">
               <StatusFilter
                 value={filter}
@@ -449,7 +467,7 @@ function App() {
         )}
       </div>
       <SiteFooter />
-    </>
+    </div>
   );
 }
 
