@@ -1,0 +1,58 @@
+/* Tabela larga rola de lado no celular, sem quebrar a página */
+.client-table-scroll {
+  overflow-x: auto;
+}
+
+.client-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.client-table th {
+  padding: 12px 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.client-table td {
+  padding: 10px 8px;
+  border-top: 1px solid #eceef1;
+  color: var(--text-soft);
+}
+
+.client-table .client-table-check {
+  width: 24px;
+  padding-left: 20px;
+}
+
+.client-table-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.client-table .client-table-company {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.client-table .client-table-muted {
+  color: var(--text-muted);
+}
+
+.client-table tr.is-selected td {
+  background: #f7fbf9;
+}
+
+.client-table-empty {
+  padding: 40px 20px;
+  color: var(--text-muted);
+  text-align: center;
+}

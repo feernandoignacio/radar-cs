@@ -15,6 +15,46 @@
   gap: 16px;
 }
 
+.app-clients {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.app-clients-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-send-button {
+  height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.app-send-button:disabled {
+  background: #c9ced5;
+  cursor: not-allowed;
+}
+
+.app-clients-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #eceef1;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 @media (max-width: 900px) {
   .app {
     padding: 20px 16px 40px;

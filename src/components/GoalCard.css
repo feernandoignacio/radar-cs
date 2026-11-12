@@ -63,7 +63,7 @@
 
 .goal-bar-done {
   left: 0;
-  border-radius: 7px;
+  border-radius: 7px 0 0 7px;
   background: #1f9d62;
 }
 
