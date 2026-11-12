@@ -43,6 +43,26 @@
   font-weight: 600;
 }
 
+.client-table .client-table-reason {
+  max-width: 280px;
+  font-size: 13px;
+}
+
+.client-table-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.client-table-contacts small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.client-table-contacts small.is-missing {
+  color: #9b1c1c;
+}
+
 .client-table .client-table-muted {
   color: var(--text-muted);
 }

@@ -3,9 +3,10 @@ import './Header.css';
 type HeaderProps = {
   batchName: string;
   total: number;
+  onImportClick: () => void;
 };
 
-export function Header({ batchName, total }: HeaderProps) {
+export function Header({ batchName, total, onImportClick }: HeaderProps) {
   return (
     <header className="header">
       <div className="header-brand">
@@ -20,15 +21,9 @@ export function Header({ batchName, total }: HeaderProps) {
         </div>
       </div>
 
-      {/* Os botões de importar ganham função na parte 3 */}
-      <div className="header-actions">
-        <button type="button" className="header-button">
-          Importar lote (CSV)
-        </button>
-        <button type="button" className="header-button">
-          Importar contatos
-        </button>
-      </div>
+      <button type="button" className="header-button" onClick={onImportClick}>
+        Importar planilhas
+      </button>
     </header>
   );
 }

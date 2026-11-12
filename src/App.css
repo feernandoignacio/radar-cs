@@ -55,6 +55,41 @@
   font-size: 13px;
 }
 
+.app-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.app-notice-success {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+.app-notice button {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+}
+
+.app-notice button:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
 @media (max-width: 900px) {
   .app {
     padding: 20px 16px 40px;

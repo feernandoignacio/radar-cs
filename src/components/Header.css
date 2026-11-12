@@ -37,12 +37,6 @@
   color: var(--text-muted);
 }
 
-.header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
 .header-button {
   height: 44px;
   padding: 0 16px;

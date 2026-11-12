@@ -52,8 +52,8 @@ export function ClientTable({
               />
             </th>
             <th>Empresa</th>
-            <th>Contato</th>
             <th>Motivo do lote</th>
+            <th>Contatos</th>
             <th>Status</th>
             <th>Última ação</th>
           </tr>
@@ -76,8 +76,23 @@ export function ClientTable({
                   />
                 </td>
                 <td className="client-table-company">{client.company}</td>
-                <td>{client.contactName}</td>
-                <td>{client.reason}</td>
+                <td className="client-table-reason">
+                  {client.reason || 'Sem motivo na planilha'}
+                </td>
+                {/* Na parte 4 vira a setinha com a lista de contatos */}
+                <td>
+                  <span className="client-table-contacts">
+                    <span>
+                      {client.emails.length}{' '}
+                      {client.emails.length === 1 ? 'email' : 'emails'}
+                    </span>
+                    <small
+                      className={client.companyPhone ? undefined : 'is-missing'}
+                    >
+                      {client.companyPhone || 'Telefone não encontrado'}
+                    </small>
+                  </span>
+                </td>
                 <td>
                   <StatusSelect
                     value={client.status}

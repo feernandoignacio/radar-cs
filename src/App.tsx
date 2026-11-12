@@ -1,21 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ClientTable } from './components/ClientTable.tsx';
 import { GoalCard } from './components/GoalCard.tsx';
 import { Header } from './components/Header.tsx';
+import { ImportPanel } from './components/ImportPanel.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
 import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
-import type { Status } from './types.ts';
+import type { Batch, Client, Status } from './types.ts';
+import { loadBatch, saveBatch } from './utils/storage.ts';
 import { getSummary } from './utils/summary.ts';
 import './App.css';
 
 function App() {
-  // Por enquanto usa os dados de exemplo. Na parte 3 vem do CSV.
-  const [clients, setClients] = useState(SAMPLE_CLIENTS);
+  // Lote salvo no navegador. Se ainda não tem, mostra o exemplo.
+  const [savedBatch] = useState(loadBatch);
+  const [importedAt, setImportedAt] = useState(savedBatch?.importedAt ?? null);
+  const [clients, setClients] = useState<Client[]>(
+    savedBatch?.clients ?? SAMPLE_CLIENTS,
+  );
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importInfo, setImportInfo] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  const isSample = importedAt === null;
   const summary = getSummary(clients);
+
+  // Toda mudança no lote importado fica salva no navegador
+  useEffect(() => {
+    if (importedAt) {
+      const batch: Batch = { importedAt, clients };
+      saveBatch(batch);
+    }
+  }, [importedAt, clients]);
   const visibleClients =
     filter === 'all'
       ? clients
@@ -25,7 +42,7 @@ function App() {
     setClients((prev) =>
       prev.map((client) =>
         client.id === id
-          ? { ...client, status, lastAction: 'Status alterado agora' }
+          ? { ...client, status, lastAction: `Status alterado em ${today()}` }
           : client,
       ),
     );
@@ -61,9 +78,51 @@ function App() {
     });
   }
 
+  function handleImport(imported: Client[]) {
+    setClients(imported);
+    setImportedAt(new Date().toISOString());
+    setSelectedIds(new Set());
+    setFilter('all');
+    setIsImportOpen(false);
+
+    const withReason = imported.filter((client) => client.reason).length;
+    const withPhone = imported.filter((client) => client.companyPhone).length;
+    setImportInfo(
+      `${imported.length} empresas importadas · ${withReason} com motivo · ${withPhone} com telefone`,
+    );
+  }
+
+  const batchName = isSample
+    ? 'Dados de exemplo'
+    : `Lote importado em ${formatDate(importedAt)}`;
+
   return (
     <div className="app">
-      <Header batchName="Lote de exemplo" total={summary.total} />
+      <Header
+        batchName={batchName}
+        total={summary.total}
+        onImportClick={() => setIsImportOpen(true)}
+      />
+
+      {isSample && (
+        <p className="app-notice">
+          Você está vendo dados de exemplo. Clique em "Importar planilhas" para
+          usar o seu lote do mês.
+        </p>
+      )}
+
+      {importInfo && (
+        <p className="app-notice app-notice-success" role="status">
+          {importInfo}
+          <button
+            type="button"
+            aria-label="Fechar aviso"
+            onClick={() => setImportInfo('')}
+          >
+            ×
+          </button>
+        </p>
+      )}
 
       <div className="app-summary">
         <GoalCard summary={summary} />
@@ -101,8 +160,29 @@ function App() {
           Mostrando {visibleClients.length} de {summary.total}
         </p>
       </section>
+
+      {isImportOpen && (
+        <ImportPanel
+          previous={isSample ? [] : clients}
+          hasSavedBatch={!isSample}
+          onClose={() => setIsImportOpen(false)}
+          onImport={handleImport}
+        />
+      )}
     </div>
   );
+}
+
+// Data de hoje no formato 12/11
+function today() {
+  return new Date().toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+  });
+}
+
+function formatDate(iso: string | null) {
+  return iso ? new Date(iso).toLocaleDateString('pt-BR') : '';
 }
 
 export default App;

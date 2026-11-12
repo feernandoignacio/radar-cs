@@ -9,7 +9,7 @@ Built to solve a real problem: the official dashboard only lists the batch and t
 - Monthly goal (50% of meetings done) with live progress
 - Forecast: meetings done + scheduled
 - Five client statuses with colors
-- Import the batch and contacts from CSV (planned)
+- Import the 3 work spreadsheets (CSV or Excel) and merge them by company
 - One-click WhatsApp message with variables (planned)
 - Send queue for several selected clients (planned)
 
@@ -19,7 +19,7 @@ Client data stays in the browser (localStorage). There is no server and nothing 
 
 ## Tech
 
-React 19, TypeScript, Vite.
+React 19, TypeScript, Vite. Spreadsheets are read in the browser with PapaParse (CSV) and a small custom .xlsx reader built on fflate.
 
 ## Running locally
 
