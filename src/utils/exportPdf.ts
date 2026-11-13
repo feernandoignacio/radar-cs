@@ -13,17 +13,23 @@ export async function exportPdf(element: HTMLElement, fileName: string) {
   const canvas = await html2canvas(element, {
     scale,
     backgroundColor: '#f5f6f8',
-    // Largura fixa, igual em qualquer tela, pensada para a folha deitada:
+    // Largura fixa, igual em qualquer tela, pensada para a folha A4 em pé:
     // o texto sai com tamanho bom para ler impresso
-    windowWidth: 1100,
+    windowWidth: 820,
     onclone: (copy, clone) => {
       // Ativa o layout do PDF só na cópia, a tela dela não muda
       copy.body.classList.add('is-exporting-pdf');
 
-      // Campos vazios mostram um traço em vez do texto de ajuda
-      clone.querySelectorAll('input').forEach((input) => {
-        input.placeholder = '-';
-      });
+      // Campo de texto não quebra linha. No PDF vira texto comum,
+      // para o motivo aparecer inteiro (vazio vira um traço).
+      clone
+        .querySelectorAll<HTMLInputElement>('input.editable-cell')
+        .forEach((input) => {
+          const text = copy.createElement('span');
+          text.className = 'pdf-cell-text';
+          text.textContent = input.value || '-';
+          input.replaceWith(text);
+        });
 
       const top = clone.getBoundingClientRect().top;
       const blocks = clone.querySelectorAll(
@@ -42,7 +48,8 @@ export async function exportPdf(element: HTMLElement, fileName: string) {
     },
   });
 
-  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  // Retrato: imprime direto em folha A4 em pé, ocupando a folha toda
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
   const margin = 24;
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();

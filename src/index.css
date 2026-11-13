@@ -107,7 +107,37 @@ p {
 }
 
 .is-exporting-pdf .app {
-  padding: 24px 24px 32px;
+  padding: 20px 16px 28px;
+}
+
+/* Na folha em pé a tabela fica mais compacta */
+.is-exporting-pdf .client-table th,
+.is-exporting-pdf .client-table td {
+  padding: 8px 6px;
+}
+
+.is-exporting-pdf .client-table .client-table-reason {
+  min-width: 0;
+  max-width: 200px;
+}
+
+.is-exporting-pdf .pdf-cell-text {
+  display: block;
+  line-height: 1.35;
+}
+
+/* Contato numa linha só, para caber mais clientes por folha */
+.is-exporting-pdf .contact-button {
+  max-width: none;
+}
+
+.is-exporting-pdf .contact-button-title,
+.is-exporting-pdf .contact-button small {
+  white-space: nowrap;
+}
+
+.is-exporting-pdf .status-card {
+  padding: 12px 14px;
 }
 
 .is-exporting-pdf .app-clients-title {
