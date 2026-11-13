@@ -1,0 +1,65 @@
+.company-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+
+.company-search svg {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.company-search input {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+/* Tira o "x" padrão do navegador: usamos o nosso */
+.company-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.company-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.company-search input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.company-search button {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.company-search button:hover {
+  background: var(--bg);
+  color: var(--text);
+}

@@ -49,7 +49,7 @@ export function ClientTable({
 
   if (clients.length === 0) {
     return (
-      <p className="client-table-empty">Nenhum cliente com esse status.</p>
+      <p className="client-table-empty">Nenhuma empresa encontrada.</p>
     );
   }
 

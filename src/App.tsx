@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Celebration } from './components/Celebration.tsx';
 import { ClientTable } from './components/ClientTable.tsx';
+import { CompanySearch } from './components/CompanySearch.tsx';
 import { ConfirmDialog } from './components/ConfirmDialog.tsx';
 import type { ContactPatch } from './components/ContactMenu.tsx';
 import { GoalCard } from './components/GoalCard.tsx';
@@ -11,7 +12,6 @@ import { NotesCard } from './components/NotesCard.tsx';
 import { SendQueue, type Queue } from './components/SendQueue.tsx';
 import { SiteFooter } from './components/SiteFooter.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
-import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
 import type { Batch, Client, Status } from './types.ts';
 import {
@@ -34,6 +34,7 @@ import { makeConfetti, type ConfettiPiece } from './utils/confetti.ts';
 import { monthSlug } from './utils/date.ts';
 import { exportPdf } from './utils/exportPdf.ts';
 import { getSummary } from './utils/summary.ts';
+import { normalizeName } from './utils/importBatch.ts';
 import './App.css';
 
 function App() {
@@ -47,7 +48,8 @@ function App() {
   const [importInfo, setImportInfo] = useState('');
   const [settings, setSettings] = useState(loadSettings);
   const [queue, setQueue] = useState<Queue | null>(null);
-  const [filter, setFilter] = useState<Filter>('all');
+  // Texto da busca por empresa (vazio = mostra todos)
+  const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [removedIds, setRemovedIds] = useState<string[]>(
     savedBatch?.removedIds ?? [],
@@ -75,10 +77,17 @@ function App() {
       saveBatch(batch);
     }
   }, [importedAt, clients, removedIds]);
-  const filteredClients =
-    filter === 'all'
-      ? clients
-      : clients.filter((client) => client.status === filter);
+  // Busca sem diferença de acento e maiúsculas. Também acha pelo CNPJ.
+  const query = normalizeName(search);
+  const queryDigits = search.replace(/\D/g, '');
+  const filteredClients = query
+    ? clients.filter(
+        (client) =>
+          normalizeName(client.company).includes(query) ||
+          (queryDigits.length >= 3 &&
+            client.document.replace(/\D/g, '').includes(queryDigits)),
+      )
+    : clients;
   // Quem já teve a reunião realizada desce para o fim da lista
   const visibleClients = [
     ...filteredClients.filter((client) => client.status !== 'done'),
@@ -183,20 +192,20 @@ function App() {
 
   async function handlePdf() {
     if (!pageRef.current) return;
-    const previousFilter = filter;
+    const previousSearch = search;
     setIsExporting(true);
     setIsDeleting(false);
-    // O PDF sai com todos os clientes, mesmo se tiver um filtro ligado
-    setFilter('all');
+    // O PDF sai com todos os clientes, mesmo se tiver uma busca ligada
+    setSearch('');
 
     try {
-      // Espera a tela redesenhar sem o filtro antes de tirar a foto
+      // Espera a tela redesenhar sem a busca antes de tirar a foto
       await new Promise((resolve) =>
         requestAnimationFrame(() => requestAnimationFrame(resolve)),
       );
       await exportPdf(pageRef.current, `radar-cs-${monthSlug()}.pdf`);
     } finally {
-      setFilter(previousFilter);
+      setSearch(previousSearch);
       setIsExporting(false);
     }
   }
@@ -264,7 +273,7 @@ function App() {
       isManual: true,
     };
     setClients((prev) => [client, ...prev]);
-    setFilter('all');
+    setSearch('');
     setIsDeleting(false);
   }
 
@@ -312,7 +321,7 @@ function App() {
     setClients(imported);
     setImportedAt(new Date().toISOString());
     setSelectedIds(new Set());
-    setFilter('all');
+    setSearch('');
     setIsImportOpen(false);
 
     const withReason = imported.filter((client) => client.reason).length;
@@ -388,18 +397,13 @@ function App() {
         </div>
 
         <section className="app-clients" aria-label="Clientes do lote">
-          {/* Só aparece no PDF, no lugar da barra de filtros */}
+          {/* Só aparece no PDF, no lugar da busca e dos botões */}
           <h2 className="pdf-only app-clients-title">
             Clientes do lote · {clients.length}
           </h2>
 
           <div className="app-clients-toolbar">
-            <StatusFilter
-              value={filter}
-              counts={summary.counts}
-              total={clients.length}
-              onChange={setFilter}
-            />
+            <CompanySearch value={search} onChange={setSearch} />
             <div className="app-row-actions">
               <button
                 type="button"
