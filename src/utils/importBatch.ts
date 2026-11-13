@@ -131,6 +131,8 @@ export function buildClients({
       whatsapp: old?.whatsapp ?? '',
       status: keepStatus && old ? old.status : 'not_tried',
       lastAction: keepStatus && old ? old.lastAction : 'Nenhuma',
+      lastContactAt: keepStatus && old ? old.lastContactAt : undefined,
+      meetingAt: keepStatus && old ? old.meetingAt : undefined,
     });
   }
 

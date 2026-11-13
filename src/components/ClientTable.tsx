@@ -16,6 +16,7 @@ type ClientTableProps = {
   onWhatsapp: (client: Client) => void;
   onCompanyChange: (id: string, company: string) => void;
   onReasonChange: (id: string, reason: string) => void;
+  onMeetingChange: (id: string, meetingAt: string) => void;
   // Modo excluir: clicar numa linha apaga ela
   isDeleting: boolean;
   onDelete: (client: Client) => void;
@@ -31,6 +32,7 @@ export function ClientTable({
   onWhatsapp,
   onCompanyChange,
   onReasonChange,
+  onMeetingChange,
   isDeleting,
   onDelete,
 }: ClientTableProps) {
@@ -147,6 +149,20 @@ export function ClientTable({
                     label={`Status de ${client.company}`}
                     onChange={(status) => onStatusChange(client.id, status)}
                   />
+                  {/* Agendada pede o dia da reunião, usado no "Para fazer hoje" */}
+                  {client.status === 'scheduled' && (
+                    <label className="meeting-date">
+                      <span>Reunião</span>
+                      <input
+                        type="date"
+                        value={client.meetingAt ?? ''}
+                        aria-label={`Data da reunião com ${client.company}`}
+                        onChange={(event) =>
+                          onMeetingChange(client.id, event.target.value)
+                        }
+                      />
+                    </label>
+                  )}
                 </td>
                 <td className="client-table-muted">{client.lastAction}</td>
                 <td className="client-table-actions">

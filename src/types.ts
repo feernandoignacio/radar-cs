@@ -26,6 +26,10 @@ export type Client = {
   status: Status;
   // Texto curto da última ação, ex: "Status alterado em 12/11"
   lastAction: string;
+  // Data da última tentativa de contato (ISO). Preenchida sozinha.
+  lastContactAt?: string;
+  // Dia da reunião agendada, no formato 2026-11-18
+  meetingAt?: string;
   // Linha criada à mão pelo botão +
   isManual?: boolean;
   // Motivo alterado à mão (não é sobrescrito ao atualizar o lote)
