@@ -9,8 +9,8 @@
 .company-search svg {
   position: absolute;
   left: 12px;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: var(--text-muted);
   stroke-width: 2;
@@ -20,8 +20,8 @@
 
 .company-search input {
   width: 100%;
-  height: 44px;
-  padding: 0 40px 0 40px;
+  height: 38px;
+  padding: 0 38px 0 38px;
   border: 1px solid var(--border-strong);
   border-radius: 10px;
   background: var(--surface);
@@ -46,16 +46,16 @@
 
 .company-search button {
   position: absolute;
-  right: 6px;
+  right: 5px;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: 0;
   border-radius: 8px;
   background: none;
   color: var(--text-muted);
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
