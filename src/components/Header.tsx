@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { currentMonth } from '../utils/date.ts';
+import { greetingFor } from '../utils/session.ts';
 import { BrandLogo } from './BrandLogo.tsx';
 import './Header.css';
 
@@ -14,6 +16,8 @@ type HeaderProps = {
   isOwner: boolean;
   onShareClick: () => void;
   onSwitchClick: () => void;
+  // Nome de quem entrou, para a saudação embaixo do mês
+  userName: string;
 };
 
 // Mostra a etiqueta só no site de atualização, para não confundir com o original
@@ -30,7 +34,11 @@ export function Header({
   isOwner,
   onShareClick,
   onSwitchClick,
+  userName,
 }: HeaderProps) {
+  const firstName = userName.trim().split(/\s+/)[0];
+  // Calcula a saudação uma vez, ao abrir a carteira
+  const [greeting] = useState(() => greetingFor(new Date()));
   return (
     <header className="header">
       <div className="header-brand">
@@ -61,6 +69,12 @@ export function Header({
               {isExporting ? 'Gerando...' : 'Baixar PDF'}
             </button>
           </div>
+          {/* Saudação pela hora do dia; fica fora do PDF */}
+          {firstName && !isExporting && (
+            <p className="header-greeting">
+              {greeting}, {firstName}!
+            </p>
+          )}
         </div>
       </div>
 

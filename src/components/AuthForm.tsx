@@ -1,5 +1,10 @@
 import { useCallback, useState, type FormEvent } from 'react';
-import { nameFromEmail, type Session } from '../utils/session.ts';
+import {
+  accountName,
+  nameFromEmail,
+  saveAccountName,
+  type Session,
+} from '../utils/session.ts';
 import { GoogleButton } from './GoogleButton.tsx';
 import './AuthForm.css';
 
@@ -28,9 +33,13 @@ export function AuthForm({ onLogin }: AuthFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const cleanEmail = email.trim().toLowerCase();
+    // Ao criar conta guarda o nome; ao entrar usa o nome guardado
+    if (isRegister) saveAccountName(cleanEmail, name.trim());
     onLogin({
       email: cleanEmail,
-      name: name.trim() || nameFromEmail(cleanEmail),
+      name:
+        (isRegister ? name.trim() : accountName(cleanEmail)) ||
+        nameFromEmail(cleanEmail),
     });
   }
 

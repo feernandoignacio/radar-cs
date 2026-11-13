@@ -55,3 +55,38 @@ export async function gravatarUrl(email: string) {
   ).join('');
   return `https://gravatar.com/avatar/${hash}?s=320&d=404`;
 }
+
+// Nome de cada conta criada neste navegador, para usar de novo ao entrar
+const NAMES_KEY = 'radar-cs:account-names:v1';
+
+function loadNames(): Record<string, string> {
+  try {
+    const saved = localStorage.getItem(NAMES_KEY);
+    return saved ? (JSON.parse(saved) as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveAccountName(email: string, name: string) {
+  try {
+    localStorage.setItem(
+      NAMES_KEY,
+      JSON.stringify({ ...loadNames(), [email]: name }),
+    );
+  } catch {
+    // Segue sem salvar
+  }
+}
+
+export function accountName(email: string): string | undefined {
+  return loadNames()[email];
+}
+
+// "Bom dia" até meio-dia, "Boa tarde" até 18h, depois "Boa noite"
+export function greetingFor(date: Date) {
+  const hour = date.getHours();
+  if (hour < 12) return 'Bom dia';
+  if (hour < 18) return 'Boa tarde';
+  return 'Boa noite';
+}

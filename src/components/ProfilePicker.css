@@ -1,4 +1,4 @@
-/* Tela de entrada com fundo branco */
+/* Tela de entrada com fundo claro e textura leve */
 .picker {
   position: relative;
   display: flex;
@@ -9,7 +9,24 @@
   overflow: hidden;
   box-sizing: border-box;
   padding: 24px 32px 56px;
-  background: #ffffff;
+  /* Papel branco com pontinhos leves e um brilho verde nos cantos */
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(14, 107, 87, 0.07),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(14, 107, 87, 0.05),
+      transparent 34%
+    ),
+    radial-gradient(rgba(14, 107, 87, 0.13) 1px, transparent 1.5px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    22px 22px;
   color: var(--text);
 }
 

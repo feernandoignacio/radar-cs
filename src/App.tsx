@@ -452,6 +452,7 @@ function App({ scope, myScope, session, share, today, onSwitch }: AppProps) {
           isOwner={isOwner}
           onShareClick={() => setIsShareOpen(true)}
           onSwitchClick={onSwitch}
+          userName={session.name}
         />
 
         {!isOwner && share && <CoverBanner share={share} onSwitch={onSwitch} />}
