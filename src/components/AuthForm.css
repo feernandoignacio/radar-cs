@@ -8,7 +8,8 @@
   padding: 32px;
   border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
   color: var(--text);
 }
 

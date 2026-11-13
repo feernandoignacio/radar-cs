@@ -1,6 +1,6 @@
 import { SAMPLE_CLIENTS } from '../sampleData.ts';
 import { initialsOf, paletteFor, shortDay } from '../team.ts';
-import { sharesReceivedBy } from '../utils/shares.ts';
+import { isPermanent, sharesReceivedBy } from '../utils/shares.ts';
 import type { Client } from '../types.ts';
 import { useEffect, useState } from 'react';
 import { loadBatch, userScope } from '../utils/storage.ts';
@@ -8,7 +8,6 @@ import { getSummary } from '../utils/summary.ts';
 import { gravatarUrl, type Session } from '../utils/session.ts';
 import { AuthForm } from './AuthForm.tsx';
 import { BrandLogo } from './BrandLogo.tsx';
-import { RadarBackdrop } from './RadarBackdrop.tsx';
 import './ProfilePicker.css';
 
 type ProfilePickerProps = {
@@ -83,10 +82,9 @@ export function ProfilePicker({
           color: from,
           colorTo: to,
           clients: loadBatch(userScope(share.ownerEmail))?.clients ?? [],
-          tag:
-            share.permission === 'edit'
-              ? `Pode editar até ${shortDay(share.until)}`
-              : `Só visualizar até ${shortDay(share.until)}`,
+          tag: `${share.permission === 'edit' ? 'Pode editar' : 'Só visualizar'} ${
+            isPermanent(share) ? '· sem prazo' : `até ${shortDay(share.until)}`
+          }`,
           tagKind: share.permission,
         };
       })
@@ -96,8 +94,6 @@ export function ProfilePicker({
 
   return (
     <main className="picker">
-      <RadarBackdrop />
-
       {/* Marca à esquerda; quem está logado e o botão Sair à direita */}
       <div className="picker-top">
         <div className="picker-brand">

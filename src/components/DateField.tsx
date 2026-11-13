@@ -11,6 +11,9 @@ type DateFieldProps = {
   value: string;
   // Dias antes deste ficam bloqueados
   min?: string;
+  // Travado: mostra o texto no lugar da data e não abre o calendário
+  disabled?: boolean;
+  disabledText?: string;
   onChange: (value: string) => void;
 };
 
@@ -24,7 +27,14 @@ function toLabel(value: string) {
 
 // Campo de data com calendário próprio, no estilo dos outros menus do app
 // (o calendário do navegador não deixa trocar as setas nem as cores)
-export function DateField({ label, value, min, onChange }: DateFieldProps) {
+export function DateField({
+  label,
+  value,
+  min,
+  disabled,
+  disabledText,
+  onChange,
+}: DateFieldProps) {
   const { isOpen, toggle, close, triggerRef, menuRef, style } =
     useFloatingMenu(296);
   // Abre no mês do dia escolhido (ou do mínimo, ou de hoje)
@@ -63,6 +73,7 @@ export function DateField({ label, value, min, onChange }: DateFieldProps) {
         ref={triggerRef}
         type="button"
         className={value ? 'date-trigger' : 'date-trigger is-empty'}
+        disabled={disabled}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-label={`${label}: ${toLabel(value)}`}
@@ -72,7 +83,7 @@ export function DateField({ label, value, min, onChange }: DateFieldProps) {
           <rect x="4" y="5" width="16" height="15" rx="3" />
           <path d="M4 10h16M9 3v4M15 3v4" />
         </svg>
-        {toLabel(value)}
+        {disabled && disabledText ? disabledText : toLabel(value)}
         <span className="menu-arrow" aria-hidden="true" />
       </button>
 

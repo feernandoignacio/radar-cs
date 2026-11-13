@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { shortDay } from '../team.ts';
 import { nameFromEmail } from '../utils/session.ts';
-import type { Permission, Share } from '../utils/shares.ts';
+import {
+  NO_END,
+  isPermanent,
+  type Permission,
+  type Share,
+} from '../utils/shares.ts';
 import { DateField } from './DateField.tsx';
 import './ConfirmDialog.css';
 import './ShareDialog.css';
@@ -30,6 +35,8 @@ export function ShareDialog({
   const [colleagueEmail, setColleagueEmail] = useState('');
   const [from, setFrom] = useState(today);
   const [until, setUntil] = useState('');
+  // Acesso vitalício: sem data para acabar
+  const [noEnd, setNoEnd] = useState(false);
   const [permission, setPermission] = useState<Permission>('edit');
   const [error, setError] = useState('');
 
@@ -53,11 +60,11 @@ export function ShareDialog({
       setError('Esse é o seu próprio email.');
       return;
     }
-    if (!until) {
+    if (!noEnd && !until) {
       setError('Escolha até quando vale o acesso.');
       return;
     }
-    if (until < from) {
+    if (!noEnd && until < from) {
       setError('A data final precisa ser depois da inicial.');
       return;
     }
@@ -68,7 +75,7 @@ export function ShareDialog({
       colleagueEmail: email,
       permission,
       from,
-      until,
+      until: noEnd ? NO_END : until,
     });
     setColleagueEmail('');
     setUntil('');
@@ -124,10 +131,22 @@ export function ShareDialog({
                 label="Fim do acesso"
                 value={until}
                 min={from}
+                disabled={noEnd}
+                disabledText="Sem prazo"
                 onChange={setUntil}
               />
             </div>
           </div>
+
+          {/* Entre as datas e a permissão: acesso que não expira */}
+          <label className="share-no-end">
+            <input
+              type="checkbox"
+              checked={noEnd}
+              onChange={(event) => setNoEnd(event.target.checked)}
+            />
+            Sem prazo (acesso até você tirar)
+          </label>
 
           <fieldset className="share-permission">
             <legend>O que a pessoa pode fazer</legend>
@@ -158,10 +177,11 @@ export function ShareDialog({
           </fieldset>
 
           <p className="share-info">
-            O acesso termina sozinho
-            {until ? ` no dia ${shortDay(until)}` : ' na data final'}. O que{' '}
-            {colleagueName || 'a pessoa'} mudar fica registrado com o nome de
-            quem mudou.
+            {noEnd
+              ? 'O acesso fica valendo até você tirar.'
+              : `O acesso termina sozinho ${until ? `no dia ${shortDay(until)}` : 'na data final'}.`}{' '}
+            O que {colleagueName || 'a pessoa'} mudar fica registrado com o nome
+            de quem mudou.
           </p>
 
           {error && (
@@ -194,7 +214,10 @@ export function ShareDialog({
                     {share.permission === 'edit'
                       ? ' · pode editar'
                       : ' · só visualizar'}{' '}
-                    · {shortDay(share.from)} a {shortDay(share.until)}
+                    ·{' '}
+                    {isPermanent(share)
+                      ? `desde ${shortDay(share.from)}, sem prazo`
+                      : `${shortDay(share.from)} a ${shortDay(share.until)}`}
                   </span>
                   <button type="button" onClick={() => onRemove(share.id)}>
                     Tirar acesso

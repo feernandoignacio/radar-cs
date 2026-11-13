@@ -17,6 +17,13 @@ export type Share = {
 
 const SHARES_KEY = 'radar-cs:shares:v2';
 
+// Acesso sem prazo: a data final fica num dia que nunca chega
+export const NO_END = '9999-12-31';
+
+export function isPermanent(share: Share) {
+  return share.until === NO_END;
+}
+
 export function loadShares(): Share[] {
   try {
     const saved = localStorage.getItem(SHARES_KEY);

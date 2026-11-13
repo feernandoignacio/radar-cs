@@ -199,3 +199,21 @@
 .share-list li strong {
   word-break: break-all;
 }
+
+/* Caixinha "Sem prazo", logo abaixo das datas */
+.share-no-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -6px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.share-no-end input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}

@@ -1,4 +1,4 @@
-/* Tela de entrada escura, como a tela de um radar */
+/* Tela de entrada com fundo branco */
 .picker {
   position: relative;
   display: flex;
@@ -9,14 +9,8 @@
   overflow: hidden;
   box-sizing: border-box;
   padding: 24px 32px 56px;
-  background: radial-gradient(circle at 50% 45%, #12352a, #08140f 70%);
-  color: #ffffff;
-}
-
-/* Tudo acima do radar do fundo */
-.picker > :not(.radar-backdrop) {
-  position: relative;
-  z-index: 1;
+  background: #ffffff;
+  color: var(--text);
 }
 
 /* Linha de cima: marca à esquerda, conta à direita */
@@ -40,23 +34,23 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #a9c2b8;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
 .picker-account button {
   height: 34px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   background: transparent;
-  color: #ffffff;
+  color: var(--text);
   font-size: 13px;
   font-weight: 600;
 }
 
 .picker-account button:hover {
-  border-color: #ffffff;
+  border-color: var(--accent);
 }
 
 @media (max-width: 520px) {
@@ -81,7 +75,7 @@
 
 /* 60% daria 9px, pequeno demais para ler: fica em 11px */
 .picker-brand p {
-  color: #a9c2b8;
+  color: var(--text-muted);
   font-size: 11px;
 }
 
@@ -101,7 +95,7 @@
 }
 
 .picker-intro p {
-  color: #b8cdc4;
+  color: var(--text-muted);
   font-size: 16px;
 }
 
@@ -126,7 +120,7 @@
   border: 0;
   border-radius: 16px;
   background: transparent;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .picker-avatar {
@@ -140,7 +134,7 @@
   border-radius: 18px;
   outline: 3px solid transparent;
   outline-offset: 4px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   transition:
     transform 0.2s ease,
     outline-color 0.2s ease;
@@ -176,7 +170,7 @@
 
 .picker-card:hover .picker-avatar,
 .picker-card:focus-visible .picker-avatar {
-  outline-color: #ffffff;
+  outline-color: var(--accent);
   transform: scale(1.05);
 }
 
@@ -185,17 +179,17 @@
 }
 
 .picker-card strong {
-  color: #e6efeb;
+  color: var(--text);
   font-size: 17px;
   font-weight: 600;
 }
 
 .picker-card:hover strong {
-  color: #ffffff;
+  color: var(--accent);
 }
 
 .picker-info {
-  color: #a9c2b8;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -222,7 +216,7 @@
 }
 
 .picker-note {
-  color: #a9c2b8;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -255,7 +249,7 @@
   }
 }
 
-/* Na tela de entrada o rodapé encosta no fundo escuro, sem faixa clara */
+/* Na tela de entrada o rodapé encosta direto no fundo branco */
 .picker + .site-footer {
   margin-top: 0;
 }

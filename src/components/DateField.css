@@ -14,11 +14,17 @@
   text-align: left;
 }
 
+.date-trigger:disabled {
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
 .date-trigger.is-empty {
   color: var(--text-muted);
 }
 
-.date-trigger:hover,
+.date-trigger:hover:not(:disabled),
 .date-trigger[aria-expanded='true'] {
   border-color: var(--accent);
 }
