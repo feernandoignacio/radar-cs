@@ -1,6 +1,6 @@
 import { SAMPLE_CLIENTS } from '../sampleData.ts';
 import {
-  AVATAR_PALETTES,
+  CURRENT_USER,
   RECEIVED_ACCESS,
   colleagueById,
   demoClients,
@@ -8,13 +8,7 @@ import {
 } from '../team.ts';
 import type { Client } from '../types.ts';
 import { useState } from 'react';
-import {
-  loadAvatar,
-  loadBatch,
-  saveAvatar,
-  type Avatar,
-} from '../utils/storage.ts';
-import { AvatarEditor } from './AvatarEditor.tsx';
+import { loadBatch } from '../utils/storage.ts';
 import { getSummary } from '../utils/summary.ts';
 import { BrandLogo } from './BrandLogo.tsx';
 import { RadarBackdrop } from './RadarBackdrop.tsx';
@@ -46,21 +40,16 @@ function initialsOf(name: string) {
 // Tela de entrada, estilo "quem está assistindo": a carteira da pessoa
 // e as dos colegas que deram acesso para ela
 export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
-  const [avatar, setAvatar] = useState(loadAvatar);
-  const [from, to] = AVATAR_PALETTES[avatar.palette] ?? AVATAR_PALETTES[0];
-
-  function handleAvatarChange(next: Avatar) {
-    // Se a foto não couber no navegador, fica a anterior
-    if (saveAvatar(next)) setAvatar(next);
-  }
+  // Se a foto do login não carregar, volta para o avatar genérico
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const mine: Card = {
     scope: 'me',
     name: 'Minha carteira',
     initials: initialsOf(myName),
-    color: from,
-    colorTo: to,
-    photo: avatar.photo,
+    color: '#25b574',
+    colorTo: '#0e6b57',
+    photo: photoFailed ? undefined : CURRENT_USER.picture,
     clients: loadBatch('me')?.clients ?? SAMPLE_CLIENTS,
     tag: 'Sua',
     tagKind: 'mine',
@@ -115,7 +104,7 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
         {cards.map((card) => {
           const { total, goal } = getSummary(card.clients);
           return (
-            <li key={card.scope} className="picker-item">
+            <li key={card.scope}>
               <button
                 type="button"
                 className="picker-card"
@@ -124,13 +113,19 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
                 <span
                   className="picker-avatar"
                   style={{
-                    background: card.photo
-                      ? `center / cover url(${card.photo})`
-                      : `linear-gradient(135deg, ${card.color}, ${card.colorTo})`,
+                    background: `linear-gradient(135deg, ${card.color}, ${card.colorTo})`,
                   }}
                   aria-hidden="true"
                 >
-                  {!card.photo && (
+                  {card.photo ? (
+                    <img
+                      className="picker-avatar-photo"
+                      src={card.photo}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      onError={() => setPhotoFailed(true)}
+                    />
+                  ) : (
                     <>
                       {/* Anéis de radar no canto, como desenho do avatar */}
                       <svg
@@ -155,10 +150,6 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
                   {card.tag}
                 </span>
               </button>
-              {/* Só o próprio perfil pode trocar a imagem */}
-              {card.scope === 'me' && (
-                <AvatarEditor avatar={avatar} onChange={handleAvatarChange} />
-              )}
             </li>
           );
         })}
