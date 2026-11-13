@@ -12,7 +12,8 @@
 .app-top {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-  align-items: start;
+  /* As duas colunas com a mesma altura: as anotações ocupam o que sobra */
+  align-items: stretch;
   gap: 20px;
 }
 
@@ -28,6 +29,11 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+}
+
+/* O último card da direita vai até embaixo, alinhado com as anotações */
+.app-aside > :last-child {
+  flex: 1;
 }
 
 .app-clients {

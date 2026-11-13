@@ -58,8 +58,7 @@ p {
 .is-exporting-pdf .app-clients-toolbar,
 .is-exporting-pdf .app-delete-notice,
 .is-exporting-pdf .app-aside,
-.is-exporting-pdf .today-card,
-.is-exporting-pdf .meeting-date,
+.is-exporting-pdf .notes-card,
 .is-exporting-pdf .client-table-check,
 .is-exporting-pdf .client-table-actions {
   display: none !important;

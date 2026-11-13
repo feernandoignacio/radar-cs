@@ -1,0 +1,88 @@
+.notes-card {
+  display: flex;
+  flex-direction: column;
+  /* Cresce até o fim da coluna, ao lado do modelo da mensagem */
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.notes-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+/* Campo e botão de copiar juntos: o botão fica no canto inferior direito */
+.notes-field {
+  position: relative;
+  display: flex;
+  flex: 1;
+}
+
+.notes-input {
+  flex: 1;
+  min-height: 80px;
+  padding: 12px 52px 12px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.notes-input::placeholder {
+  color: var(--text-muted);
+}
+
+.notes-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.notes-copy {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.notes-copy:hover:not(:disabled) {
+  border-color: var(--accent-border);
+  color: var(--accent-text);
+}
+
+.notes-copy:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.notes-copy.is-copied {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.notes-copy svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

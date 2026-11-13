@@ -4,6 +4,7 @@ import { DEFAULT_SETTINGS, type MessageSettings } from './message.ts';
 // O "v1" deixa trocar o formato no futuro sem quebrar dados antigos
 const STORAGE_KEY = 'radar-cs:batch:v1';
 const SETTINGS_KEY = 'radar-cs:settings:v1';
+const NOTES_KEY = 'radar-cs:notes:v1';
 
 // Os dados ficam só no navegador dela. Nada vai para servidor.
 export function loadBatch(): Batch | null {
@@ -43,11 +44,29 @@ export function saveSettings(settings: MessageSettings) {
   }
 }
 
+// Anotações livres (estratégia da semana, lembretes)
+export function loadNotes(): string {
+  try {
+    return localStorage.getItem(NOTES_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export function saveNotes(notes: string) {
+  try {
+    localStorage.setItem(NOTES_KEY, notes);
+  } catch {
+    // Segue sem salvar
+  }
+}
+
 // Botão "Apagar dados": tira tudo deste navegador
 export function clearAll() {
   try {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(SETTINGS_KEY);
+    localStorage.removeItem(NOTES_KEY);
   } catch {
     // Nada a fazer
   }

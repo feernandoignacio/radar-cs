@@ -6,11 +6,11 @@ import { GoalCard } from './components/GoalCard.tsx';
 import { Header } from './components/Header.tsx';
 import { ImportPanel } from './components/ImportPanel.tsx';
 import { MessageEditor } from './components/MessageEditor.tsx';
+import { NotesCard } from './components/NotesCard.tsx';
 import { SendQueue, type Queue } from './components/SendQueue.tsx';
 import { SiteFooter } from './components/SiteFooter.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
 import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
-import { TodayCard } from './components/TodayCard.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
 import type { Batch, Client, Status } from './types.ts';
 import {
@@ -29,7 +29,6 @@ import {
 import { monthSlug } from './utils/date.ts';
 import { exportPdf } from './utils/exportPdf.ts';
 import { getSummary } from './utils/summary.ts';
-import { getTodo, shortDay } from './utils/todo.ts';
 import './App.css';
 
 function App() {
@@ -60,9 +59,6 @@ function App() {
 
   const isSample = importedAt === null;
   const summary = getSummary(clients);
-  // Data de referência do "Para fazer hoje", pega ao abrir a página
-  const [now] = useState(() => new Date());
-  const todo = getTodo(clients, now);
 
   // Toda mudança no lote importado fica salva no navegador
   useEffect(() => {
@@ -85,44 +81,9 @@ function App() {
     setClients((prev) =>
       prev.map((client) =>
         client.id === id
-          ? {
-              ...client,
-              status,
-              lastAction: `Status alterado em ${today()}`,
-              // Marcar "sem sucesso" conta como uma tentativa de hoje
-              lastContactAt:
-                status === 'tried'
-                  ? new Date().toISOString()
-                  : client.lastContactAt,
-            }
+          ? { ...client, status, lastAction: `Status alterado em ${today()}` }
           : client,
       ),
-    );
-  }
-
-  function handleMeetingChange(id: string, meetingAt: string) {
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === id
-          ? {
-              ...client,
-              meetingAt: meetingAt || undefined,
-              lastAction: meetingAt
-                ? `Reunião marcada para ${shortDay(meetingAt)}`
-                : client.lastAction,
-            }
-          : client,
-      ),
-    );
-  }
-
-  // Botão "Ver..." do card: filtra a tabela e desce até ela
-  function handleShowStatus(status: Status) {
-    setFilter(status);
-    requestAnimationFrame(() =>
-      document
-        .querySelector('.app-clients')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
     );
   }
 
@@ -147,7 +108,6 @@ function App() {
               ...item,
               status: item.status === 'not_tried' ? 'tried' : item.status,
               lastAction: `WhatsApp em ${today()}`,
-              lastContactAt: new Date().toISOString(),
             }
           : item,
       ),
@@ -376,13 +336,7 @@ function App() {
           <div className="app-summary">
             <GoalCard summary={summary} />
             <StatusCards summary={summary} />
-            <TodayCard
-              todo={todo}
-              now={now}
-              onStatusChange={handleStatusChange}
-              onWhatsapp={handleWhatsapp}
-              onShowStatus={handleShowStatus}
-            />
+            <NotesCard />
           </div>
 
           <aside className="app-aside">
@@ -472,7 +426,6 @@ function App() {
             onWhatsapp={handleWhatsapp}
             onCompanyChange={handleCompanyChange}
             onReasonChange={handleReasonChange}
-            onMeetingChange={handleMeetingChange}
             isDeleting={isDeleting}
             onDelete={handleDelete}
           />
