@@ -265,3 +265,15 @@
     padding: 20px 16px 40px;
   }
 }
+
+/* Caixa invisível em volta da tabela, só para travar tudo no "só visualizar" */
+.app-table-lock {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.app-table-lock:disabled {
+  opacity: 0.85;
+}

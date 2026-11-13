@@ -1,17 +1,23 @@
 import { useRef, useState } from 'react';
-import { loadNotes, saveNotes } from '../utils/storage.ts';
+import { loadNotes, saveNotes, type Scope } from '../utils/storage.ts';
 import './NotesCard.css';
 
 // Espaço livre para anotar a estratégia da semana ou o que quiser.
 // Salva a cada letra, só neste navegador. Não entra no PDF.
-export function NotesCard() {
-  const [notes, setNotes] = useState(loadNotes);
+type NotesCardProps = {
+  scope: Scope;
+  // Colega com "só visualizar" lê as anotações, mas não muda
+  readOnly: boolean;
+};
+
+export function NotesCard({ scope, readOnly }: NotesCardProps) {
+  const [notes, setNotes] = useState(() => loadNotes(scope));
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<number | undefined>(undefined);
 
   function handleChange(value: string) {
     setNotes(value);
-    saveNotes(value);
+    saveNotes(value, scope);
   }
 
   async function handleCopy() {
@@ -36,6 +42,7 @@ export function NotesCard() {
           id="notes-input"
           className="notes-input"
           value={notes}
+          readOnly={readOnly}
           placeholder="Estratégia da semana, lembretes, o que quiser anotar."
           onChange={(event) => handleChange(event.target.value)}
         />

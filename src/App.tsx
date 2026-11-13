@@ -42,11 +42,44 @@ import {
 } from './utils/backup.ts';
 import { getSummary } from './utils/summary.ts';
 import { normalizeName } from './utils/importBatch.ts';
+import { CoverBanner } from './components/CoverBanner.tsx';
+import { ShareDialog } from './components/ShareDialog.tsx';
+import { RECEIVED_ACCESS, colleagueById, demoClients } from './team.ts';
+import {
+  activeShares,
+  loadShares,
+  saveShares,
+  type Share,
+} from './utils/shares.ts';
 import './App.css';
 
-function App() {
+type AppProps = {
+  // Carteira aberta: "me" é a da própria pessoa, o resto é de colegas
+  scope: string;
+  today: string;
+  onSwitch: () => void;
+};
+
+function App({ scope, today, onSwitch }: AppProps) {
+  const isOwner = scope === 'me';
+  const owner = colleagueById(scope);
+  const access = RECEIVED_ACCESS.find((item) => item.ownerId === scope);
+  // Dona ou colega com "pode editar"
+  const canEdit = isOwner || access?.permission === 'edit';
+
   // Lote salvo no navegador. Se ainda não tem, mostra o exemplo.
-  const [savedBatch] = useState(loadBatch);
+  // Carteira de colega (protótipo) começa com clientes inventados.
+  const [savedBatch] = useState(
+    () =>
+      loadBatch(scope) ??
+      (isOwner
+        ? null
+        : {
+            importedAt: new Date().toISOString(),
+            clients: demoClients(scope),
+            removedIds: [],
+          }),
+  );
   const [importedAt, setImportedAt] = useState(savedBatch?.importedAt ?? null);
   const [clients, setClients] = useState<Client[]>(
     savedBatch?.clients ?? SAMPLE_CLIENTS,
@@ -65,6 +98,8 @@ function App() {
   );
   const [isDeleting, setIsDeleting] = useState(false);
   // Janela de confirmação aberta: excluir uma linha ou limpar tudo
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shares, setShares] = useState(() => activeShares(loadShares(), today));
   const [confirm, setConfirm] = useState<
     | { kind: 'delete'; client: Client }
     | { kind: 'clear' }
@@ -76,6 +111,7 @@ function App() {
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [backupError, setBackupError] = useState('');
   const closeConfirm = useCallback(() => setConfirm(null), []);
+  const closeShare = useCallback(() => setIsShareOpen(false), []);
   const [isExporting, setIsExporting] = useState(false);
   // Confetes da comemoração da meta (null = sem festa na tela)
   const [confetti, setConfetti] = useState<ConfettiPiece[] | null>(null);
@@ -90,9 +126,9 @@ function App() {
   useEffect(() => {
     if (importedAt) {
       const batch: Batch = { importedAt, clients, removedIds };
-      saveBatch(batch);
+      saveBatch(batch, scope);
     }
-  }, [importedAt, clients, removedIds]);
+  }, [importedAt, clients, removedIds, scope]);
   // Busca sem diferença de acento e maiúsculas. Também acha pelo CNPJ.
   const query = normalizeName(search);
   const queryDigits = search.replace(/\D/g, '');
@@ -119,9 +155,9 @@ function App() {
     if (wasReached || !isGoalReached(next)) return;
 
     const batchKey = importedAt ?? 'exemplo';
-    if (loadCelebrated() === batchKey) return;
+    if (loadCelebrated(scope) === batchKey) return;
 
-    saveCelebrated(batchKey);
+    saveCelebrated(batchKey, scope);
     setConfetti(makeConfetti());
     playCelebrationSound();
   }
@@ -135,10 +171,31 @@ function App() {
     setClients((prev) =>
       prev.map((client) =>
         client.id === id
-          ? { ...client, status, lastAction: `Status alterado em ${today()}` }
+          ? {
+              ...client,
+              status,
+              lastAction: stamp(`Status alterado em ${shortToday()}`),
+            }
           : client,
       ),
     );
+  }
+
+  // Na carteira de um colega, a última ação leva o nome de quem mudou
+  function stamp(text: string) {
+    return isOwner ? text : `${text} por ${settings.myName || 'colega'}`;
+  }
+
+  function handleAddShare(share: Share) {
+    const next = [...shares, share];
+    setShares(next);
+    saveShares(next);
+  }
+
+  function handleRemoveShare(id: string) {
+    const next = shares.filter((share) => share.id !== id);
+    setShares(next);
+    saveShares(next);
   }
 
   function handleSettingsChange(next: MessageSettings) {
@@ -161,7 +218,7 @@ function App() {
           ? {
               ...item,
               status: item.status === 'not_tried' ? 'tried' : item.status,
-              lastAction: `WhatsApp em ${today()}`,
+              lastAction: stamp(`WhatsApp em ${shortToday()}`),
             }
           : item,
       ),
@@ -312,7 +369,7 @@ function App() {
       contactName: '',
       whatsapp: '',
       status: 'not_tried',
-      lastAction: `Criada em ${today()}`,
+      lastAction: stamp(`Criada em ${shortToday()}`),
       isManual: true,
     };
     setClients((prev) => [client, ...prev]);
@@ -391,7 +448,14 @@ function App() {
           onClearClick={() => setConfirm({ kind: 'clear' })}
           onPdfClick={handlePdf}
           isExporting={isExporting}
+          isOwner={isOwner}
+          onShareClick={() => setIsShareOpen(true)}
+          onSwitchClick={onSwitch}
         />
+
+        {!isOwner && owner && access && (
+          <CoverBanner owner={owner} access={access} onSwitch={onSwitch} />
+        )}
 
         {isSample && (
           <p className="app-notice">
@@ -419,7 +483,7 @@ function App() {
           <div className="app-summary">
             <GoalCard summary={summary} />
             <StatusCards summary={summary} />
-            <NotesCard />
+            <NotesCard scope={scope} readOnly={!canEdit} />
           </div>
 
           <aside className="app-aside">
@@ -436,7 +500,9 @@ function App() {
             <MessageEditor
               settings={settings}
               // Prévia com os dados do primeiro selecionado; sem seleção, um exemplo
-              previewClient={clients.find((client) => selectedIds.has(client.id))}
+              previewClient={clients.find((client) =>
+                selectedIds.has(client.id),
+              )}
               onChange={handleSettingsChange}
             />
           </aside>
@@ -462,6 +528,7 @@ function App() {
               <button
                 type="button"
                 className="app-icon-button app-add-button"
+                disabled={!canEdit}
                 aria-label="Adicionar linha"
                 title="Adicionar linha"
                 onClick={handleAddRow}
@@ -473,6 +540,7 @@ function App() {
               <button
                 type="button"
                 className="app-icon-button app-delete-button"
+                disabled={!canEdit}
                 aria-label="Excluir linha"
                 aria-pressed={isDeleting}
                 title="Excluir linha"
@@ -485,7 +553,7 @@ function App() {
               <button
                 type="button"
                 className="app-send-button"
-                disabled={selectedIds.size === 0 || queue !== null}
+                disabled={!canEdit || selectedIds.size === 0 || queue !== null}
                 onClick={handleStartQueue}
               >
                 Enviar para {selectedIds.size}{' '}
@@ -503,57 +571,63 @@ function App() {
             </p>
           )}
 
-          <ClientTable
-            clients={visibleClients}
-            selectedIds={selectedIds}
-            onToggle={handleToggle}
-            onToggleAll={handleToggleAll}
-            onStatusChange={handleStatusChange}
-            onContactChange={handleContactChange}
-            onWhatsapp={handleWhatsapp}
-            onCompanyChange={handleCompanyChange}
-            onReasonChange={handleReasonChange}
-            isDeleting={isDeleting}
-            onDelete={handleDelete}
-          />
+          {/* Só visualizar: a tabela inteira fica travada */}
+          <fieldset className="app-table-lock" disabled={!canEdit}>
+            <ClientTable
+              clients={visibleClients}
+              selectedIds={selectedIds}
+              onToggle={handleToggle}
+              onToggleAll={handleToggleAll}
+              onStatusChange={handleStatusChange}
+              onContactChange={handleContactChange}
+              onWhatsapp={handleWhatsapp}
+              onCompanyChange={handleCompanyChange}
+              onReasonChange={handleReasonChange}
+              isDeleting={isDeleting}
+              onDelete={handleDelete}
+            />
+          </fieldset>
 
           <div className="app-clients-footer">
             <p>
               Mostrando {visibleClients.length} de {clients.length}
             </p>
             {/* Backup no fim da lista, longe dos botões do dia a dia */}
-            <div className="app-backup">
-              {backupError && (
-                <span className="app-backup-error" role="alert">
-                  {backupError}
-                </span>
-              )}
-              <button
-                type="button"
-                className="app-backup-button"
-                onClick={() => setConfirm({ kind: 'backup' })}
-              >
-                Baixar backup
-              </button>
-              <button
-                type="button"
-                className="app-backup-button"
-                onClick={() => restoreInputRef.current?.click()}
-              >
-                Restaurar backup
-              </button>
-              <input
-                ref={restoreInputRef}
-                type="file"
-                accept=".json,application/json"
-                hidden
-                onChange={(event) => {
-                  void handleRestoreFile(event.target.files?.[0]);
-                  // Limpa para conseguir escolher o mesmo arquivo de novo
-                  event.target.value = '';
-                }}
-              />
-            </div>
+            {/* Backup só na carteira da própria pessoa */}
+            {isOwner && (
+              <div className="app-backup">
+                {backupError && (
+                  <span className="app-backup-error" role="alert">
+                    {backupError}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="app-backup-button"
+                  onClick={() => setConfirm({ kind: 'backup' })}
+                >
+                  Baixar backup
+                </button>
+                <button
+                  type="button"
+                  className="app-backup-button"
+                  onClick={() => restoreInputRef.current?.click()}
+                >
+                  Restaurar backup
+                </button>
+                <input
+                  ref={restoreInputRef}
+                  type="file"
+                  accept=".json,application/json"
+                  hidden
+                  onChange={(event) => {
+                    void handleRestoreFile(event.target.files?.[0]);
+                    // Limpa para conseguir escolher o mesmo arquivo de novo
+                    event.target.value = '';
+                  }}
+                />
+              </div>
+            )}
           </div>
         </section>
 
@@ -562,6 +636,16 @@ function App() {
             Os dados ficam só neste navegador. Nada é enviado para servidores.
           </p>
         </footer>
+
+        {isShareOpen && (
+          <ShareDialog
+            today={today}
+            shares={shares}
+            onAdd={handleAddShare}
+            onRemove={handleRemoveShare}
+            onClose={closeShare}
+          />
+        )}
 
         {isImportOpen && (
           <ImportPanel
@@ -616,9 +700,7 @@ function App() {
         )}
       </div>
       <SiteFooter />
-      {confetti && (
-        <Celebration confetti={confetti} onDone={endCelebration} />
-      )}
+      {confetti && <Celebration confetti={confetti} onDone={endCelebration} />}
     </div>
   );
 }
@@ -629,7 +711,7 @@ function isGoalReached(list: Client[]) {
 }
 
 // Data de hoje no formato 12/11
-function today() {
+function shortToday() {
   return new Date().toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',

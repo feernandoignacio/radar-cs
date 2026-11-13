@@ -1,4 +1,5 @@
 import { currentMonth } from '../utils/date.ts';
+import { BrandLogo } from './BrandLogo.tsx';
 import './Header.css';
 
 type HeaderProps = {
@@ -9,10 +10,14 @@ type HeaderProps = {
   onClearClick: () => void;
   onPdfClick: () => void;
   isExporting: boolean;
+  // Só a dona da carteira importa, limpa e dá acesso
+  isOwner: boolean;
+  onShareClick: () => void;
+  onSwitchClick: () => void;
 };
 
 // Mostra a etiqueta só no site de atualização, para não confundir com o original
-const IS_TEST_SITE = window.location.hostname.includes('atualizacao')
+const IS_TEST_SITE = window.location.hostname.includes('atualizacao');
 
 export function Header({
   batchName,
@@ -22,28 +27,20 @@ export function Header({
   onClearClick,
   onPdfClick,
   isExporting,
+  isOwner,
+  onShareClick,
+  onSwitchClick,
 }: HeaderProps) {
   return (
     <header className="header">
       <div className="header-brand">
         {/* Logo e nome lado a lado, como uma marca só */}
         <div className="header-lockup">
-          {/* Logo do radar: os círculos são o alcance e o ponto é o cliente encontrado */}
-          <svg
-            className="header-logo"
-            viewBox="0 0 120 120"
-            aria-hidden="true"
-          >
-            <rect width="120" height="120" rx="28" fill="#0e6b57" />
-            <circle cx="60" cy="60" r="40" fill="none" stroke="#fff" strokeOpacity="0.35" strokeWidth="5" />
-            <circle cx="60" cy="60" r="24" fill="none" stroke="#fff" strokeOpacity="0.35" strokeWidth="5" />
-            <path d="M60 60 L60 20 A40 40 0 0 1 94.64 40 Z" fill="#fff" fillOpacity="0.22" />
-            <path d="M60 60 L60 20" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-            <circle cx="74" cy="37" r="9" fill="#9ff0c9" />
-            <circle cx="60" cy="60" r="6" fill="#fff" />
-          </svg>
+          <BrandLogo className="header-logo" />
           <h1 className="header-title">Radar CS</h1>
-          {IS_TEST_SITE && <span className="header-test-tag">Versão de teste</span>}
+          {IS_TEST_SITE && (
+            <span className="header-test-tag">Versão de teste</span>
+          )}
         </div>
         <div className="header-info">
           <p className="header-subtitle">
@@ -68,16 +65,34 @@ export function Header({
       </div>
 
       <div className="header-actions">
-        <button type="button" className="header-button" onClick={onImportClick}>
-          Importar planilhas
+        <button type="button" className="header-button" onClick={onSwitchClick}>
+          Trocar carteira
         </button>
-        <button
-          type="button"
-          className="header-button header-button-danger"
-          onClick={onClearClick}
-        >
-          Limpar dados
-        </button>
+        {isOwner && (
+          <>
+            <button
+              type="button"
+              className="header-button"
+              onClick={onShareClick}
+            >
+              Dar acesso
+            </button>
+            <button
+              type="button"
+              className="header-button"
+              onClick={onImportClick}
+            >
+              Importar planilhas
+            </button>
+            <button
+              type="button"
+              className="header-button header-button-danger"
+              onClick={onClearClick}
+            >
+              Limpar dados
+            </button>
+          </>
+        )}
       </div>
     </header>
   );

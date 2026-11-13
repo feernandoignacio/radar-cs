@@ -7,19 +7,27 @@ const SETTINGS_KEY = 'radar-cs:settings:v1';
 const NOTES_KEY = 'radar-cs:notes:v1';
 const CELEBRATED_KEY = 'radar-cs:celebrated:v1';
 
+// Cada carteira guarda os dados à parte. "me" é a carteira da própria
+// pessoa e usa as chaves de sempre, então os dados antigos continuam valendo.
+export type Scope = string;
+
+function scoped(key: string, scope: Scope) {
+  return scope === 'me' ? key : key.replace('radar-cs:', `radar-cs:${scope}:`);
+}
+
 // Os dados ficam só no navegador dela. Nada vai para servidor.
-export function loadBatch(): Batch | null {
+export function loadBatch(scope: Scope = 'me'): Batch | null {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(scoped(STORAGE_KEY, scope));
     return saved ? (JSON.parse(saved) as Batch) : null;
   } catch {
     return null;
   }
 }
 
-export function saveBatch(batch: Batch) {
+export function saveBatch(batch: Batch, scope: Scope = 'me') {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(batch));
+    localStorage.setItem(scoped(STORAGE_KEY, scope), JSON.stringify(batch));
   } catch {
     // Navegador sem espaço ou em modo privado: segue sem salvar
   }
@@ -46,34 +54,34 @@ export function saveSettings(settings: MessageSettings) {
 }
 
 // Anotações livres (estratégia da semana, lembretes)
-export function loadNotes(): string {
+export function loadNotes(scope: Scope = 'me'): string {
   try {
-    return localStorage.getItem(NOTES_KEY) ?? '';
+    return localStorage.getItem(scoped(NOTES_KEY, scope)) ?? '';
   } catch {
     return '';
   }
 }
 
-export function saveNotes(notes: string) {
+export function saveNotes(notes: string, scope: Scope = 'me') {
   try {
-    localStorage.setItem(NOTES_KEY, notes);
+    localStorage.setItem(scoped(NOTES_KEY, scope), notes);
   } catch {
     // Segue sem salvar
   }
 }
 
 // Lote em que a meta já foi comemorada, para a festa aparecer uma vez só
-export function loadCelebrated(): string {
+export function loadCelebrated(scope: Scope = 'me'): string {
   try {
-    return localStorage.getItem(CELEBRATED_KEY) ?? '';
+    return localStorage.getItem(scoped(CELEBRATED_KEY, scope)) ?? '';
   } catch {
     return '';
   }
 }
 
-export function saveCelebrated(batchKey: string) {
+export function saveCelebrated(batchKey: string, scope: Scope = 'me') {
   try {
-    localStorage.setItem(CELEBRATED_KEY, batchKey);
+    localStorage.setItem(scoped(CELEBRATED_KEY, scope), batchKey);
   } catch {
     // Segue sem salvar
   }

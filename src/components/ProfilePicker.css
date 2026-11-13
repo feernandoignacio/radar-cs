@@ -1,0 +1,141 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 56px 24px;
+}
+
+.picker-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.picker-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-title);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.picker-logo {
+  width: 44px;
+  height: 44px;
+}
+
+.picker-brand p {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.picker-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.picker-intro h1 {
+  font-family: var(--font-title);
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.picker-intro p {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.picker-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 210px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 22px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text);
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.picker-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.picker-avatar {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 28px;
+  color: #ffffff;
+  font-family: var(--font-title);
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.picker-card strong {
+  font-size: 17px;
+}
+
+.picker-info {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.picker-tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.picker-tag-mine {
+  background: #dff3e8;
+  color: #0b5a3b;
+}
+
+.picker-tag-edit {
+  background: #fff1d6;
+  color: #7a4a06;
+}
+
+.picker-tag-view {
+  background: #e2eeff;
+  color: #1d4b9e;
+}
+
+.picker-note {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picker-card {
+    transition: none;
+  }
+}
