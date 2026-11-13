@@ -12,6 +12,7 @@ import { NotesCard } from './components/NotesCard.tsx';
 import { SendQueue, type Queue } from './components/SendQueue.tsx';
 import { SiteFooter } from './components/SiteFooter.tsx';
 import { StatusCards } from './components/StatusCards.tsx';
+import { StatusFilter, type Filter } from './components/StatusFilter.tsx';
 import { SAMPLE_CLIENTS } from './sampleData.ts';
 import type { Batch, Client, Status } from './types.ts';
 import {
@@ -56,6 +57,8 @@ function App() {
   const [queue, setQueue] = useState<Queue | null>(null);
   // Texto da busca por empresa (vazio = mostra todos)
   const [search, setSearch] = useState('');
+  // Filtro por status, embaixo da busca
+  const [filter, setFilter] = useState<Filter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [removedIds, setRemovedIds] = useState<string[]>(
     savedBatch?.removedIds ?? [],
@@ -93,14 +96,16 @@ function App() {
   // Busca sem diferença de acento e maiúsculas. Também acha pelo CNPJ.
   const query = normalizeName(search);
   const queryDigits = search.replace(/\D/g, '');
-  const filteredClients = query
-    ? clients.filter(
-        (client) =>
-          normalizeName(client.company).includes(query) ||
-          (queryDigits.length >= 3 &&
-            client.document.replace(/\D/g, '').includes(queryDigits)),
-      )
-    : clients;
+  // Busca e filtro funcionam juntos: "Agendada" + "pad" mostra só as agendadas com "pad"
+  const filteredClients = clients.filter((client) => {
+    if (filter !== 'all' && client.status !== filter) return false;
+    if (!query) return true;
+    return (
+      normalizeName(client.company).includes(query) ||
+      (queryDigits.length >= 3 &&
+        client.document.replace(/\D/g, '').includes(queryDigits))
+    );
+  });
   // Quem já teve a reunião realizada desce para o fim da lista
   const visibleClients = [
     ...filteredClients.filter((client) => client.status !== 'done'),
@@ -206,10 +211,12 @@ function App() {
   async function handlePdf() {
     if (!pageRef.current) return;
     const previousSearch = search;
+    const previousFilter = filter;
     setIsExporting(true);
     setIsDeleting(false);
-    // O PDF sai com todos os clientes, mesmo se tiver uma busca ligada
+    // O PDF sai com todos os clientes, mesmo com busca ou filtro ligados
     setSearch('');
+    setFilter('all');
 
     try {
       // Espera a tela redesenhar sem a busca antes de tirar a foto
@@ -219,6 +226,7 @@ function App() {
       await exportPdf(pageRef.current, `radar-cs-${monthSlug()}.pdf`);
     } finally {
       setSearch(previousSearch);
+      setFilter(previousFilter);
       setIsExporting(false);
     }
   }
@@ -309,6 +317,7 @@ function App() {
     };
     setClients((prev) => [client, ...prev]);
     setSearch('');
+    setFilter('all');
     setIsDeleting(false);
   }
 
@@ -357,6 +366,7 @@ function App() {
     setImportedAt(new Date().toISOString());
     setSelectedIds(new Set());
     setSearch('');
+    setFilter('all');
     setIsImportOpen(false);
 
     const withReason = imported.filter((client) => client.reason).length;
@@ -425,7 +435,8 @@ function App() {
             )}
             <MessageEditor
               settings={settings}
-              previewClient={visibleClients[0] ?? clients[0]}
+              // Prévia com os dados do primeiro selecionado; sem seleção, um exemplo
+              previewClient={clients.find((client) => selectedIds.has(client.id))}
               onChange={handleSettingsChange}
             />
           </aside>
@@ -438,7 +449,15 @@ function App() {
           </h2>
 
           <div className="app-clients-toolbar">
-            <CompanySearch value={search} onChange={setSearch} />
+            <div className="app-clients-filters">
+              <CompanySearch value={search} onChange={setSearch} />
+              <StatusFilter
+                value={filter}
+                counts={summary.counts}
+                total={clients.length}
+                onChange={setFilter}
+              />
+            </div>
             <div className="app-row-actions">
               <button
                 type="button"

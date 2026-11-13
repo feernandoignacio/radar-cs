@@ -14,6 +14,20 @@ type MessageEditorProps = {
   onChange: (settings: MessageSettings) => void;
 };
 
+// Sem cliente selecionado, a prévia mostra os nomes das variáveis
+const EXAMPLE_CLIENT: Client = {
+  id: 'exemplo',
+  company: '[empresa]',
+  document: '',
+  reason: '',
+  emails: [],
+  companyPhone: '',
+  contactName: '[contato]',
+  whatsapp: '',
+  status: 'not_tried',
+  lastAction: '',
+};
+
 export function MessageEditor({
   settings,
   previewClient,
@@ -105,16 +119,20 @@ export function MessageEditor({
         </button>
       </div>
 
-      {previewClient && (
-        <div className="message-preview">
-          <p className="message-preview-label">
-            Prévia para {previewClient.company}
-          </p>
-          <p className="message-preview-text">
-            {fillTemplate(settings.template, previewClient, settings)}
-          </p>
-        </div>
-      )}
+      <div className="message-preview">
+        <p className="message-preview-label">
+          {previewClient
+            ? `Prévia para ${previewClient.company || 'linha sem nome'}`
+            : 'Prévia · selecione um cliente para ver com os dados dele'}
+        </p>
+        <p className="message-preview-text">
+          {fillTemplate(
+            settings.template,
+            previewClient ?? EXAMPLE_CLIENT,
+            settings,
+          )}
+        </p>
+      </div>
     </section>
   );
 }

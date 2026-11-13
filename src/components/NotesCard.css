@@ -42,8 +42,9 @@
   color: var(--text-muted);
 }
 
+/* Foco em cinza, para não parecer o verde da meta batida */
 .notes-input:focus {
-  border-color: var(--accent);
+  border-color: var(--text-muted);
   outline: none;
 }
 
