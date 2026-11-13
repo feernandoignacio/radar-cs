@@ -9,12 +9,14 @@ export type Colleague = {
   id: string;
   name: string;
   color: string;
+  // Segunda cor do degradê do avatar na tela de entrada
+  colorTo: string;
 };
 
 export const TEAM: Colleague[] = [
-  { id: 'bruno', name: 'Bruno Lima', color: '#2f6fdb' },
-  { id: 'carla', name: 'Carla Dias', color: '#7c4dd6' },
-  { id: 'diego', name: 'Diego Rocha', color: '#b45309' },
+  { id: 'bruno', name: 'Bruno Lima', color: '#2f6fdb', colorTo: '#6d3fd1' },
+  { id: 'carla', name: 'Carla Dias', color: '#c2418f', colorTo: '#7c4dd6' },
+  { id: 'diego', name: 'Diego Rocha', color: '#d9541e', colorTo: '#b45309' },
 ];
 
 // Carteiras de colegas que deram acesso para quem está usando

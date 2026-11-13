@@ -1,0 +1,121 @@
+.date-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 400;
+  text-align: left;
+}
+
+.date-trigger.is-empty {
+  color: var(--text-muted);
+}
+
+.date-trigger:hover,
+.date-trigger[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+
+.date-trigger svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* A seta fica no canto direito, igual aos outros menus */
+.date-trigger .menu-arrow {
+  margin-left: auto;
+}
+
+/* Acima da janela de "Dar acesso" */
+.date-menu {
+  z-index: 40;
+  padding: 12px;
+}
+
+.date-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.date-month {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.date-nav {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-soft);
+}
+
+.date-nav:hover {
+  background: #f1f5f7;
+  color: var(--text);
+}
+
+/* Mesmo triângulo dos menus, virado para os lados */
+.date-nav-prev {
+  transform: rotate(90deg);
+}
+
+.date-nav-next {
+  transform: rotate(-90deg);
+}
+
+.date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.date-weekday {
+  padding: 4px 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.date-day {
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.date-day:hover:not(:disabled) {
+  background: #f1f5f7;
+}
+
+.date-day.is-selected {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.date-day:disabled {
+  color: #c3c8cf;
+  cursor: not-allowed;
+}

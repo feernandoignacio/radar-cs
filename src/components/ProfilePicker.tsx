@@ -9,6 +9,7 @@ import type { Client } from '../types.ts';
 import { loadBatch } from '../utils/storage.ts';
 import { getSummary } from '../utils/summary.ts';
 import { BrandLogo } from './BrandLogo.tsx';
+import { RadarBackdrop } from './RadarBackdrop.tsx';
 import './ProfilePicker.css';
 
 type ProfilePickerProps = {
@@ -22,6 +23,7 @@ type Card = {
   name: string;
   initials: string;
   color: string;
+  colorTo: string;
   clients: Client[];
   tag: string;
   tagKind: 'mine' | 'edit' | 'view';
@@ -39,7 +41,8 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
     scope: 'me',
     name: 'Minha carteira',
     initials: initialsOf(myName),
-    color: '#0e6b57',
+    color: '#25b574',
+    colorTo: '#0e6b57',
     clients: loadBatch('me')?.clients ?? SAMPLE_CLIENTS,
     tag: 'Sua',
     tagKind: 'mine',
@@ -56,6 +59,7 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
         name: owner.name,
         initials: initialsOf(owner.name),
         color: owner.color,
+        colorTo: owner.colorTo,
         clients: loadBatch(owner.id)?.clients ?? demoClients(owner.id),
         tag:
           access.permission === 'edit'
@@ -70,6 +74,8 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
 
   return (
     <main className="picker">
+      <RadarBackdrop />
+
       <div className="picker-brand">
         <div className="picker-lockup">
           <BrandLogo className="picker-logo" />
@@ -99,10 +105,20 @@ export function ProfilePicker({ today, myName, onOpen }: ProfilePickerProps) {
               >
                 <span
                   className="picker-avatar"
-                  style={{ background: card.color }}
+                  style={{
+                    background: `linear-gradient(135deg, ${card.color}, ${card.colorTo})`,
+                  }}
                   aria-hidden="true"
                 >
-                  {card.initials}
+                  {/* Anéis de radar no canto, como desenho do avatar */}
+                  <svg className="picker-avatar-rings" viewBox="0 0 100 100">
+                    <circle cx="100" cy="100" r="30" />
+                    <circle cx="100" cy="100" r="52" />
+                    <circle cx="100" cy="100" r="74" />
+                  </svg>
+                  <span className="picker-avatar-initials">
+                    {card.initials}
+                  </span>
                 </span>
                 <strong>{card.name}</strong>
                 <span className="picker-info">

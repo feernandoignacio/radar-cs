@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TEAM, colleagueById, shortDay, type Permission } from '../team.ts';
 import type { Share } from '../utils/shares.ts';
+import { DateField } from './DateField.tsx';
 import './ConfirmDialog.css';
 import './ShareDialog.css';
 
@@ -91,24 +92,24 @@ export function ShareDialog({
           </label>
 
           <div className="share-dates">
-            <label className="share-field">
-              De
-              <input
-                type="date"
+            <div className="share-field">
+              <span>De</span>
+              <DateField
+                label="Início do acesso"
                 value={from}
                 min={today}
-                onChange={(event) => setFrom(event.target.value)}
+                onChange={setFrom}
               />
-            </label>
-            <label className="share-field">
-              Até
-              <input
-                type="date"
+            </div>
+            <div className="share-field">
+              <span>Até</span>
+              <DateField
+                label="Fim do acesso"
                 value={until}
                 min={from}
-                onChange={(event) => setUntil(event.target.value)}
+                onChange={setUntil}
               />
-            </label>
+            </div>
           </div>
 
           <fieldset className="share-permission">
