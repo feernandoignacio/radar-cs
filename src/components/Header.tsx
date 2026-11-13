@@ -11,6 +11,9 @@ type HeaderProps = {
   isExporting: boolean;
 };
 
+// Mostra a etiqueta só no site de atualização, para não confundir com o original
+const IS_TEST_SITE = window.location.hostname.includes('atualizacao')
+
 export function Header({
   batchName,
   total,
@@ -40,6 +43,7 @@ export function Header({
             <circle cx="60" cy="60" r="6" fill="#fff" />
           </svg>
           <h1 className="header-title">Radar CS</h1>
+          {IS_TEST_SITE && <span className="header-test-tag">Versão de teste</span>}
         </div>
         <div className="header-info">
           <p className="header-subtitle">
