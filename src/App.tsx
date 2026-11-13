@@ -33,6 +33,12 @@ import { playCelebrationSound } from './utils/celebrationSound.ts';
 import { makeConfetti, type ConfettiPiece } from './utils/confetti.ts';
 import { monthSlug } from './utils/date.ts';
 import { exportPdf } from './utils/exportPdf.ts';
+import {
+  downloadBackup,
+  readBackup,
+  restoreBackup,
+  type BackupInfo,
+} from './utils/backup.ts';
 import { getSummary } from './utils/summary.ts';
 import { normalizeName } from './utils/importBatch.ts';
 import './App.css';
@@ -57,8 +63,15 @@ function App() {
   const [isDeleting, setIsDeleting] = useState(false);
   // Janela de confirmação aberta: excluir uma linha ou limpar tudo
   const [confirm, setConfirm] = useState<
-    { kind: 'delete'; client: Client } | { kind: 'clear' } | null
+    | { kind: 'delete'; client: Client }
+    | { kind: 'clear' }
+    | { kind: 'backup' }
+    | { kind: 'restore'; backup: BackupInfo }
+    | null
   >(null);
+  // Campo de arquivo escondido do "Restaurar backup"
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+  const [backupError, setBackupError] = useState('');
   const closeConfirm = useCallback(() => setConfirm(null), []);
   const [isExporting, setIsExporting] = useState(false);
   // Confetes da comemoração da meta (null = sem festa na tela)
@@ -208,6 +221,28 @@ function App() {
       setSearch(previousSearch);
       setIsExporting(false);
     }
+  }
+
+  function confirmBackup() {
+    setConfirm(null);
+    downloadBackup();
+  }
+
+  // Ela escolhe o arquivo; antes de trocar os dados, pede confirmação
+  async function handleRestoreFile(file: File | undefined) {
+    if (!file) return;
+    setBackupError('');
+    try {
+      const backup = await readBackup(file);
+      setConfirm({ kind: 'restore', backup });
+    } catch (error) {
+      setBackupError((error as Error).message);
+    }
+  }
+
+  function confirmRestore(backup: BackupInfo) {
+    restoreBackup(backup.file);
+    window.location.reload();
   }
 
   function handleClearData() {
@@ -463,9 +498,44 @@ function App() {
             onDelete={handleDelete}
           />
 
-          <p className="app-clients-footer">
-            Mostrando {visibleClients.length} de {clients.length}
-          </p>
+          <div className="app-clients-footer">
+            <p>
+              Mostrando {visibleClients.length} de {clients.length}
+            </p>
+            {/* Backup no fim da lista, longe dos botões do dia a dia */}
+            <div className="app-backup">
+              {backupError && (
+                <span className="app-backup-error" role="alert">
+                  {backupError}
+                </span>
+              )}
+              <button
+                type="button"
+                className="app-backup-button"
+                onClick={() => setConfirm({ kind: 'backup' })}
+              >
+                Baixar backup
+              </button>
+              <button
+                type="button"
+                className="app-backup-button"
+                onClick={() => restoreInputRef.current?.click()}
+              >
+                Restaurar backup
+              </button>
+              <input
+                ref={restoreInputRef}
+                type="file"
+                accept=".json,application/json"
+                hidden
+                onChange={(event) => {
+                  void handleRestoreFile(event.target.files?.[0]);
+                  // Limpa para conseguir escolher o mesmo arquivo de novo
+                  event.target.value = '';
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         <footer className="app-footer">
@@ -489,6 +559,29 @@ function App() {
             message={`${confirm.client.company || 'Esta linha sem nome'} vai sair da lista. Isso não pode ser desfeito.`}
             confirmLabel="Excluir"
             onConfirm={() => confirmDelete(confirm.client)}
+            onCancel={closeConfirm}
+          />
+        )}
+
+        {confirm?.kind === 'backup' && (
+          <ConfirmDialog
+            title="Baixar backup?"
+            message="O arquivo tem dados sensíveis de clientes, como nomes de empresas e contatos. Guarde só no seu computador e não compartilhe com ninguém."
+            confirmLabel="Baixar"
+            icon="lock"
+            tone="safe"
+            onConfirm={confirmBackup}
+            onCancel={closeConfirm}
+          />
+        )}
+
+        {confirm?.kind === 'restore' && (
+          <ConfirmDialog
+            title="Restaurar backup?"
+            message={`Os dados de agora serão trocados pelos do backup de ${formatDate(confirm.backup.exportedAt) || 'data desconhecida'}, com ${confirm.backup.clients} ${confirm.backup.clients === 1 ? 'cliente' : 'clientes'}. Isso não pode ser desfeito.`}
+            confirmLabel="Restaurar"
+            icon="upload"
+            onConfirm={() => confirmRestore(confirm.backup)}
             onCancel={closeConfirm}
           />
         )}

@@ -79,13 +79,13 @@ export function saveCelebrated(batchKey: string) {
   }
 }
 
+// Tudo o que o app guarda, usado pelo backup
+export const ALL_KEYS = [STORAGE_KEY, SETTINGS_KEY, NOTES_KEY, CELEBRATED_KEY];
+
 // Botão "Apagar dados": tira tudo deste navegador
 export function clearAll() {
   try {
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(SETTINGS_KEY);
-    localStorage.removeItem(NOTES_KEY);
-    localStorage.removeItem(CELEBRATED_KEY);
+    for (const key of ALL_KEYS) localStorage.removeItem(key);
   } catch {
     // Nada a fazer
   }

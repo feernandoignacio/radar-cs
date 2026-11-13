@@ -7,6 +7,17 @@ type ConfirmDialogProps = {
   confirmLabel: string;
   onConfirm: () => void;
   onCancel: () => void;
+  // Ícone do topo. A lixeira é o padrão (excluir e limpar).
+  icon?: 'trash' | 'lock' | 'upload';
+  // "safe" deixa o botão de confirmar verde, para ações que não apagam nada
+  tone?: 'danger' | 'safe';
+};
+
+const ICONS = {
+  trash:
+    'M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3',
+  lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3M12 15v2',
+  upload: 'M12 16V4M7 9l5-5 5 5M5 20h14',
 };
 
 // Janela de confirmação no centro da tela, no lugar do window.confirm
@@ -16,6 +27,8 @@ export function ConfirmDialog({
   confirmLabel,
   onConfirm,
   onCancel,
+  icon = 'trash',
+  tone = 'danger',
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
 
@@ -39,9 +52,12 @@ export function ConfirmDialog({
         aria-describedby="confirm-message"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="confirm-icon" aria-hidden="true">
+        <div
+          className={`confirm-icon confirm-icon-${icon}`}
+          aria-hidden="true"
+        >
           <svg viewBox="0 0 24 24">
-            <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+            <path d={ICONS[icon]} />
           </svg>
         </div>
         <h2 id="confirm-title">{title}</h2>
@@ -55,7 +71,11 @@ export function ConfirmDialog({
           >
             Cancelar
           </button>
-          <button type="button" className="confirm-danger" onClick={onConfirm}>
+          <button
+            type="button"
+            className={tone === 'safe' ? 'confirm-safe' : 'confirm-danger'}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </button>
         </div>

@@ -147,9 +147,43 @@
 }
 
 .app-clients-footer {
-  padding: 14px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 20px;
   border-top: 1px solid #eceef1;
   color: var(--text-muted);
+  font-size: 13px;
+}
+
+.app-backup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.app-backup-button {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.app-backup-button:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.app-backup-error {
+  color: #9b1c1c;
   font-size: 13px;
 }
 

@@ -34,6 +34,12 @@
   color: #c62828;
 }
 
+/* Aviso de dados sensíveis: cadeado em amarelo */
+.confirm-icon-lock {
+  background: #fff1d6;
+  color: #8a5300;
+}
+
 .confirm-icon svg {
   width: 26px;
   height: 26px;
@@ -88,6 +94,16 @@
 
 .confirm-danger:hover {
   background: #a91f1f;
+}
+
+.confirm-safe {
+  border: 0;
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.confirm-safe:hover {
+  background: #0b5a48;
 }
 
 @keyframes confirm-fade {
