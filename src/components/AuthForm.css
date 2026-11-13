@@ -1,0 +1,130 @@
+/* Cartão de login: branco, cantos arredondados e sombra, sobre o radar */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(400px, 100%);
+  box-sizing: border-box;
+  padding: 32px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+}
+
+.auth-form h1 {
+  font-family: var(--font-title);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-form input {
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.auth-form input::placeholder {
+  color: var(--text-muted);
+}
+
+.auth-form input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 107, 87, 0.15);
+}
+
+.password-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.forgot-password {
+  align-self: flex-end;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.auth-help {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Botão principal verde; cinza enquanto falta preencher algo */
+.auth-submit {
+  height: 46px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: #0b5a48;
+}
+
+.auth-submit:disabled {
+  background: #eceeef;
+  color: #8a929c;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  align-self: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.auth-switch strong {
+  color: var(--accent-text);
+}
+
+.auth-switch:hover strong {
+  text-decoration: underline;
+}
+
+.auth-proto {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .auth-form {
+    padding: 24px 20px;
+  }
+}

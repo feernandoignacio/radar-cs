@@ -13,19 +13,6 @@ export type Colleague = {
   colorTo: string;
 };
 
-// Quem está usando o app. Quando tiver login com o Google, o nome,
-// o email e a foto de perfil vêm dele. Sem foto, fica o avatar genérico.
-export type CurrentUser = {
-  name: string;
-  email: string;
-  picture?: string;
-};
-
-export const CURRENT_USER: CurrentUser = {
-  name: '',
-  email: '',
-};
-
 export const TEAM: Colleague[] = [
   { id: 'bruno', name: 'Bruno Lima', color: '#2f6fdb', colorTo: '#6d3fd1' },
   { id: 'carla', name: 'Carla Dias', color: '#c2418f', colorTo: '#7c4dd6' },

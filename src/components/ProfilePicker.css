@@ -19,13 +19,50 @@
   z-index: 1;
 }
 
+/* Linha de cima: marca à esquerda, conta à direita */
+.picker-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  align-self: stretch;
+}
+
 /* Marca no canto superior esquerdo, menor, como num cabeçalho */
 .picker-brand {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  align-self: flex-start;
   gap: 2px;
+}
+
+.picker-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #a9c2b8;
+  font-size: 13px;
+}
+
+.picker-account button {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.picker-account button:hover {
+  border-color: #ffffff;
+}
+
+@media (max-width: 520px) {
+  .picker-account span {
+    display: none;
+  }
 }
 
 .picker-lockup {
