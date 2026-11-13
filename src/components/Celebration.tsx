@@ -11,7 +11,7 @@ type CelebrationProps = {
 // Confetes caindo e um aviso no topo. Some sozinho, sem precisar fechar.
 export function Celebration({ confetti, onDone }: CelebrationProps) {
   useEffect(() => {
-    const timer = window.setTimeout(onDone, 4000);
+    const timer = window.setTimeout(onDone, 5000);
     return () => window.clearTimeout(timer);
   }, [onDone]);
 
