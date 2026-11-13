@@ -78,6 +78,11 @@
   list-style: none;
 }
 
+/* Cada perfil: o lápis fica por cima, preso no canto do avatar */
+.picker-item {
+  position: relative;
+}
+
 /* Sem caixa em volta: o avatar é o cartão, como nos perfis de streaming */
 .picker-card {
   display: flex;
@@ -207,4 +212,9 @@
   .picker-card:hover .picker-avatar {
     transform: none;
   }
+}
+
+/* Na tela de entrada o rodapé encosta no fundo escuro, sem faixa clara */
+.picker + .site-footer {
+  margin-top: 0;
 }

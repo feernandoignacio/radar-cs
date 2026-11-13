@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { TEAM, colleagueById, shortDay, type Permission } from '../team.ts';
 import type { Share } from '../utils/shares.ts';
 import { DateField } from './DateField.tsx';
+import { PersonSelect } from './PersonSelect.tsx';
 import './ConfirmDialog.css';
 import './ShareDialog.css';
 
@@ -77,19 +78,15 @@ export function ShareDialog({
         </div>
 
         <form className="share-form" onSubmit={handleSubmit}>
-          <label className="share-field">
-            Quem vai cuidar
-            <select
+          <div className="share-field">
+            <span>Quem vai cuidar</span>
+            <PersonSelect
+              label="Quem vai cuidar"
+              people={TEAM}
               value={colleagueId}
-              onChange={(event) => setColleagueId(event.target.value)}
-            >
-              {TEAM.map((person) => (
-                <option key={person.id} value={person.id}>
-                  {person.name}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={setColleagueId}
+            />
+          </div>
 
           <div className="share-dates">
             <div className="share-field">

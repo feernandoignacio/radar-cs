@@ -6,6 +6,7 @@ const STORAGE_KEY = 'radar-cs:batch:v1';
 const SETTINGS_KEY = 'radar-cs:settings:v1';
 const NOTES_KEY = 'radar-cs:notes:v1';
 const CELEBRATED_KEY = 'radar-cs:celebrated:v1';
+const AVATAR_KEY = 'radar-cs:avatar:v1';
 
 // Cada carteira guarda os dados à parte. "me" é a carteira da própria
 // pessoa e usa as chaves de sempre, então os dados antigos continuam valendo.
@@ -87,8 +88,39 @@ export function saveCelebrated(batchKey: string, scope: Scope = 'me') {
   }
 }
 
+// Avatar da pessoa na tela de entrada: uma foto ou uma das cores
+export type Avatar = {
+  photo?: string;
+  palette: number;
+};
+
+export function loadAvatar(): Avatar {
+  try {
+    const saved = localStorage.getItem(AVATAR_KEY);
+    return saved ? (JSON.parse(saved) as Avatar) : { palette: 0 };
+  } catch {
+    return { palette: 0 };
+  }
+}
+
+export function saveAvatar(avatar: Avatar) {
+  try {
+    localStorage.setItem(AVATAR_KEY, JSON.stringify(avatar));
+    return true;
+  } catch {
+    // Foto grande demais para o navegador guardar
+    return false;
+  }
+}
+
 // Tudo o que o app guarda, usado pelo backup
-export const ALL_KEYS = [STORAGE_KEY, SETTINGS_KEY, NOTES_KEY, CELEBRATED_KEY];
+export const ALL_KEYS = [
+  STORAGE_KEY,
+  SETTINGS_KEY,
+  NOTES_KEY,
+  CELEBRATED_KEY,
+  AVATAR_KEY,
+];
 
 // Botão "Apagar dados": tira tudo deste navegador
 export function clearAll() {
