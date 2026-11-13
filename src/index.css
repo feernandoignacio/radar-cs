@@ -63,19 +63,12 @@ p {
   display: none !important;
 }
 
-/* Meta em largura total e os 8 cards em duas linhas de 4 */
-.is-exporting-pdf .app-summary {
+/* Sem o modelo de mensagem, meta e cards ocupam a largura toda */
+.is-exporting-pdf .app-top {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.is-exporting-pdf .status-cards {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-/* Tabela ocupa a largura toda, sem rolagem */
-.is-exporting-pdf .app-clients {
-  flex-basis: 100%;
-}
+/* Tabela sem rolagem */
 
 .is-exporting-pdf .client-table-scroll {
   overflow: visible;

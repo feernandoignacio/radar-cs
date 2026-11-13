@@ -33,7 +33,7 @@ export async function exportPdf(element: HTMLElement, fileName: string) {
 
       const top = clone.getBoundingClientRect().top;
       const blocks = clone.querySelectorAll(
-        '.header, .app-summary, .goal-card, .status-cards, .app-clients-title, .client-table thead, .client-table tbody tr, .app-clients, .app-footer',
+        '.header, .app-top, .goal-card, .status-cards, .app-clients-title, .client-table thead, .client-table tbody tr, .app-clients, .app-footer',
       );
       breakPoints = Array.from(blocks, (block) =>
         Math.round((block.getBoundingClientRect().bottom - top) * scale),

@@ -7,8 +7,15 @@ type StatusCardsProps = {
   summary: Summary;
 };
 
-// Os 4 primeiros ficam em grade 2x2, "não quer contato" vai embaixo
-const GRID_STATUSES: Status[] = ['not_tried', 'tried', 'scheduled', 'done'];
+// Seis cards em 3 colunas e 2 linhas; a previsão fica ao lado, ocupando as duas
+const CARD_STATUSES: Status[] = [
+  'not_tried',
+  'tried',
+  'scheduled',
+  'done',
+  'opted_out',
+  'in_review',
+];
 
 export function StatusCards({ summary }: StatusCardsProps) {
   const { total, counts, forecast, goal } = summary;
@@ -16,33 +23,7 @@ export function StatusCards({ summary }: StatusCardsProps) {
 
   return (
     <div className="status-cards">
-      {GRID_STATUSES.map((status) => (
-        <div key={status} className="status-card">
-          <span className="status-card-label">
-            <i style={{ background: STATUS_INFO[status].dot }} />
-            {STATUS_INFO[status].label}
-          </span>
-          <span className="status-card-number">{counts[status]}</span>
-        </div>
-      ))}
-
-      <div className="status-card status-card-wide status-card-forecast">
-        <span className="status-card-texts">
-          <strong>Previsão de fechamento</strong>
-          <small>
-            Realizadas + agendadas
-            {missingForForecast > 0
-              ? ` · faltam ${missingForForecast} para a meta`
-              : ' · bate a meta'}
-          </small>
-        </span>
-        <span className="status-card-number">
-          {forecast} <small>({percent(forecast, total)}%)</small>
-        </span>
-      </div>
-
-      {/* Os dois que ficam fora do andamento normal, lado a lado */}
-      {(['opted_out', 'in_review'] as Status[]).map((status) => (
+      {CARD_STATUSES.map((status) => (
         <div key={status} className="status-card">
           <span className="status-card-label">
             <i style={{ background: STATUS_INFO[status].dot }} />
@@ -54,6 +35,22 @@ export function StatusCards({ summary }: StatusCardsProps) {
           )}
         </div>
       ))}
+
+      <div className="status-card status-card-forecast">
+        <strong className="status-card-forecast-title">
+          Previsão de fechamento
+        </strong>
+        <span className="status-card-number">
+          {forecast} <small>({percent(forecast, total)}%)</small>
+        </span>
+        <small className="status-card-forecast-text">
+          Realizadas + agendadas
+          <br />
+          {missingForForecast > 0
+            ? `Faltam ${missingForForecast} para a meta`
+            : 'Bate a meta'}
+        </small>
+      </div>
     </div>
   );
 }

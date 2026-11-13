@@ -1,6 +1,6 @@
 .status-cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.2fr);
   gap: 12px;
 }
 
@@ -12,14 +12,6 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
-}
-
-.status-card-wide {
-  grid-column: span 2;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
 }
 
 .status-card-label {
@@ -50,27 +42,40 @@
 }
 
 .status-card-forecast {
+  /* Retângulo ao lado dos cards, ocupando as duas linhas */
+  grid-row: 1 / span 2;
+  grid-column: 4;
+  justify-content: center;
+  gap: 6px;
   border-color: var(--accent-border);
   background: var(--accent-soft);
   color: var(--accent-text);
 }
 
-.status-card-texts {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.status-card-forecast-title {
+  font-size: 14px;
 }
 
-.status-card-texts strong {
-  font-size: 13px;
-}
-
-.status-card-texts small {
-  font-size: 12px;
+.status-card-forecast-text {
   color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .status-card-hint {
   color: var(--text-muted);
   font-size: 12px;
+}
+
+/* Telas estreitas: 2 colunas e a previsão em largura total no topo */
+@media (max-width: 640px) {
+  .status-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-card-forecast {
+    grid-row: auto;
+    grid-column: 1 / -1;
+    order: -1;
+  }
 }

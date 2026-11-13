@@ -329,88 +329,13 @@ function App() {
           </p>
         )}
 
-        <div className="app-summary">
-          <GoalCard summary={summary} />
-          <StatusCards summary={summary} />
-        </div>
-
-        <div className="app-main">
-          <section className="app-clients" aria-label="Clientes do lote">
-            {/* Só aparece no PDF, no lugar da barra de filtros */}
-            <h2 className="pdf-only app-clients-title">
-              Clientes do lote · {clients.length}
-            </h2>
-
-            <div className="app-clients-toolbar">
-              <StatusFilter
-                value={filter}
-                counts={summary.counts}
-                total={clients.length}
-                onChange={setFilter}
-              />
-              <div className="app-row-actions">
-                <button
-                  type="button"
-                  className="app-icon-button app-add-button"
-                  aria-label="Adicionar linha"
-                  title="Adicionar linha"
-                  onClick={handleAddRow}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className="app-icon-button app-delete-button"
-                  aria-label="Excluir linha"
-                  aria-pressed={isDeleting}
-                  title="Excluir linha"
-                  onClick={() => setIsDeleting((value) => !value)}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className="app-send-button"
-                  disabled={selectedIds.size === 0 || queue !== null}
-                  onClick={handleStartQueue}
-                >
-                  Enviar para {selectedIds.size}{' '}
-                  {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
-                </button>
-              </div>
-            </div>
-
-            {isDeleting && (
-              <p className="app-delete-notice" role="status">
-                Clique na linha que deseja excluir.
-                <button type="button" onClick={() => setIsDeleting(false)}>
-                  Cancelar
-                </button>
-              </p>
-            )}
-
-            <ClientTable
-              clients={visibleClients}
-              selectedIds={selectedIds}
-              onToggle={handleToggle}
-              onToggleAll={handleToggleAll}
-              onStatusChange={handleStatusChange}
-              onContactChange={handleContactChange}
-              onWhatsapp={handleWhatsapp}
-              onCompanyChange={handleCompanyChange}
-              onReasonChange={handleReasonChange}
-              isDeleting={isDeleting}
-              onDelete={handleDelete}
-            />
-
-            <p className="app-clients-footer">
-              Mostrando {visibleClients.length} de {clients.length}
-            </p>
-          </section>
+        {/* Topo: meta e cards à esquerda, mensagem e fila à direita.
+            Assim a tabela embaixo fica com a largura toda. */}
+        <div className="app-top">
+          <div className="app-summary">
+            <GoalCard summary={summary} />
+            <StatusCards summary={summary} />
+          </div>
 
           <aside className="app-aside">
             {queue && (
@@ -430,6 +355,83 @@ function App() {
             />
           </aside>
         </div>
+
+        <section className="app-clients" aria-label="Clientes do lote">
+          {/* Só aparece no PDF, no lugar da barra de filtros */}
+          <h2 className="pdf-only app-clients-title">
+            Clientes do lote · {clients.length}
+          </h2>
+
+          <div className="app-clients-toolbar">
+            <StatusFilter
+              value={filter}
+              counts={summary.counts}
+              total={clients.length}
+              onChange={setFilter}
+            />
+            <div className="app-row-actions">
+              <button
+                type="button"
+                className="app-icon-button app-add-button"
+                aria-label="Adicionar linha"
+                title="Adicionar linha"
+                onClick={handleAddRow}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="app-icon-button app-delete-button"
+                aria-label="Excluir linha"
+                aria-pressed={isDeleting}
+                title="Excluir linha"
+                onClick={() => setIsDeleting((value) => !value)}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="app-send-button"
+                disabled={selectedIds.size === 0 || queue !== null}
+                onClick={handleStartQueue}
+              >
+                Enviar para {selectedIds.size}{' '}
+                {selectedIds.size === 1 ? 'selecionado' : 'selecionados'}
+              </button>
+            </div>
+          </div>
+
+          {isDeleting && (
+            <p className="app-delete-notice" role="status">
+              Clique na linha que deseja excluir.
+              <button type="button" onClick={() => setIsDeleting(false)}>
+                Cancelar
+              </button>
+            </p>
+          )}
+
+          <ClientTable
+            clients={visibleClients}
+            selectedIds={selectedIds}
+            onToggle={handleToggle}
+            onToggleAll={handleToggleAll}
+            onStatusChange={handleStatusChange}
+            onContactChange={handleContactChange}
+            onWhatsapp={handleWhatsapp}
+            onCompanyChange={handleCompanyChange}
+            onReasonChange={handleReasonChange}
+            isDeleting={isDeleting}
+            onDelete={handleDelete}
+          />
+
+          <p className="app-clients-footer">
+            Mostrando {visibleClients.length} de {clients.length}
+          </p>
+        </section>
 
         <footer className="app-footer">
           <p>
