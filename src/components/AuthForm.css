@@ -186,3 +186,8 @@
     padding: 24px 20px;
   }
 }
+
+/* Campo obrigatório vazio: borda vermelha */
+.auth-form input[aria-invalid='true'] {
+  border-color: #c62828;
+}

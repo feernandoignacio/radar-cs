@@ -25,13 +25,15 @@ export function AuthForm({ onLogin }: AuthFormProps) {
   const isRegister = mode === 'register';
 
   // O botão só fica ativo quando os campos obrigatórios estão preenchidos
-  const canSubmit =
-    email.trim() !== '' &&
-    password.length >= 8 &&
-    (!isRegister || name.trim() !== '');
+  // O nome é conferido ao enviar, para poder avisar que é obrigatório
+  const canSubmit = email.trim() !== '' && password.length >= 8;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isRegister && name.trim() === '') {
+      setError('O nome é obrigatório para criar a conta.');
+      return;
+    }
     const cleanEmail = email.trim().toLowerCase();
     // Ao criar conta guarda o nome; ao entrar usa o nome guardado
     if (isRegister) saveAccountName(cleanEmail, name.trim());
@@ -46,6 +48,7 @@ export function AuthForm({ onLogin }: AuthFormProps) {
   // Troca entre "entrar" e "criar conta"
   function toggleMode() {
     setMode(isRegister ? 'login' : 'register');
+    setError('');
     setShowHelp(false);
   }
 
@@ -55,14 +58,17 @@ export function AuthForm({ onLogin }: AuthFormProps) {
 
       {isRegister && (
         <label>
-          Nome
+          Nome *
           <input
             type="text"
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setError('');
+            }}
+            aria-invalid={error !== '' && name.trim() === ''}
             placeholder="Como você quer ser chamada"
             autoComplete="name"
-            required
           />
         </label>
       )}
