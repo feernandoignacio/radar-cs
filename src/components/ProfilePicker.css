@@ -5,33 +5,36 @@
   gap: 40px;
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 56px 24px;
+  padding: 24px 32px 56px;
 }
 
+/* Marca no canto superior esquerdo, menor, como num cabeçalho */
 .picker-brand {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
+  align-self: flex-start;
+  gap: 2px;
 }
 
 .picker-lockup {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-family: var(--font-title);
-  font-size: 28px;
+  font-size: 17px;
   font-weight: 600;
 }
 
 .picker-logo {
-  width: 44px;
-  height: 44px;
+  width: 26px;
+  height: 26px;
 }
 
+/* 60% daria 9px, pequeno demais para ler: fica em 11px */
 .picker-brand p {
   color: var(--text-muted);
-  font-size: 15px;
+  font-size: 11px;
 }
 
 .picker-intro {
