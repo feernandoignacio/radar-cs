@@ -44,9 +44,6 @@ export function AuthForm({ onLogin }: AuthFormProps) {
     <form className="auth-form" onSubmit={handleSubmit}>
       <h1>{isRegister ? 'Criar conta' : 'Entrar'}</h1>
 
-      {/* Google primeiro, depois a linha "ou" e o formulário normal */}
-      <GoogleButton onLogin={onLogin} onError={handleError} />
-
       {isRegister && (
         <label>
           Nome
@@ -116,6 +113,9 @@ export function AuthForm({ onLogin }: AuthFormProps) {
       <button type="submit" className="auth-submit" disabled={!canSubmit}>
         {isRegister ? 'Criar conta' : 'Continuar'}
       </button>
+
+      {/* Depois do "Continuar": a linha "ou" e o botão do Google */}
+      <GoogleButton onLogin={onLogin} onError={handleError} />
 
       <button type="button" className="auth-switch" onClick={toggleMode}>
         {isRegister ? 'Já tem conta?' : 'Não tem conta?'}{' '}

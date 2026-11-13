@@ -121,19 +121,22 @@
   font-size: 13px;
 }
 
-/* Botão "Continuar com o Google": branco, arredondado, logo à esquerda */
+/* Botão "Continuar com o Google": branco, arredondado, logo à esquerda.
+   Menor que o "Continuar": 25% mais baixo e 20% mais estreito. */
 .google-button {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 46px;
+  align-self: center;
+  width: 80%;
+  height: 35px;
   padding: 0 16px;
   border: 1px solid var(--border-strong);
   border-radius: 999px;
   background: #ffffff;
   color: var(--text);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -148,9 +151,9 @@
 
 .google-logo {
   position: absolute;
-  left: 16px;
-  width: 20px;
-  height: 20px;
+  left: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Linha com "ou" entre o Google e o formulário */

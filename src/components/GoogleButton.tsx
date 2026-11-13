@@ -109,6 +109,8 @@ export function GoogleButton({ onLogin, onError }: GoogleButtonProps) {
 
   return (
     <>
+      <p className="auth-divider">ou</p>
+
       <button
         type="button"
         className="google-button"
@@ -140,8 +142,6 @@ export function GoogleButton({ onLogin, onError }: GoogleButtonProps) {
         </svg>
         Continuar com o Google
       </button>
-
-      <p className="auth-divider">ou</p>
     </>
   );
 }
