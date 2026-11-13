@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Celebration } from './components/Celebration.tsx';
 import { ClientTable } from './components/ClientTable.tsx';
 import { ConfirmDialog } from './components/ConfirmDialog.tsx';
 import type { ContactPatch } from './components/ContactMenu.tsx';
@@ -22,10 +23,14 @@ import {
 import {
   clearAll,
   loadBatch,
+  loadCelebrated,
   loadSettings,
   saveBatch,
+  saveCelebrated,
   saveSettings,
 } from './utils/storage.ts';
+import { playCelebrationSound } from './utils/celebrationSound.ts';
+import { makeConfetti, type ConfettiPiece } from './utils/confetti.ts';
 import { monthSlug } from './utils/date.ts';
 import { exportPdf } from './utils/exportPdf.ts';
 import { getSummary } from './utils/summary.ts';
@@ -54,6 +59,9 @@ function App() {
   >(null);
   const closeConfirm = useCallback(() => setConfirm(null), []);
   const [isExporting, setIsExporting] = useState(false);
+  // Confetes da comemoração da meta (null = sem festa na tela)
+  const [confetti, setConfetti] = useState<ConfettiPiece[] | null>(null);
+  const endCelebration = useCallback(() => setConfetti(null), []);
   // Área da página que vira o PDF (tudo, menos o modelo de mensagem)
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +85,26 @@ function App() {
     ...filteredClients.filter((client) => client.status === 'done'),
   ];
 
+  // Comemora quando a mudança faz o lote bater a meta.
+  // Só uma vez por lote: se cair e bater de novo, o card fica verde sem festa.
+  function celebrateIfReached(next: Client[]) {
+    const wasReached = isGoalReached(clients);
+    if (wasReached || !isGoalReached(next)) return;
+
+    const batchKey = importedAt ?? 'exemplo';
+    if (loadCelebrated() === batchKey) return;
+
+    saveCelebrated(batchKey);
+    setConfetti(makeConfetti());
+    playCelebrationSound();
+  }
+
   function handleStatusChange(id: string, status: Status) {
+    celebrateIfReached(
+      clients.map((client) =>
+        client.id === id ? { ...client, status } : client,
+      ),
+    );
     setClients((prev) =>
       prev.map((client) =>
         client.id === id
@@ -247,6 +274,8 @@ function App() {
 
   function confirmDelete(client: Client) {
     setConfirm(null);
+    // Tirar uma linha diminui o lote e pode fazer bater a meta
+    celebrateIfReached(clients.filter((item) => item.id !== client.id));
 
     setClients((prev) => prev.filter((item) => item.id !== client.id));
     setSelectedIds((prev) => {
@@ -471,8 +500,16 @@ function App() {
         )}
       </div>
       <SiteFooter />
+      {confetti && (
+        <Celebration confetti={confetti} onDone={endCelebration} />
+      )}
     </div>
   );
+}
+
+function isGoalReached(list: Client[]) {
+  const { total, missingForGoal } = getSummary(list);
+  return total > 0 && missingForGoal === 0;
 }
 
 // Data de hoje no formato 12/11

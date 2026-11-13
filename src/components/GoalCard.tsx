@@ -10,9 +10,14 @@ export function GoalCard({ summary }: GoalCardProps) {
   const { total, counts, goal, missingForGoal } = summary;
   const donePercent = percent(counts.done, total);
   const scheduledPercent = percent(counts.scheduled, total);
+  const isReached = total > 0 && missingForGoal === 0;
 
   return (
-    <section className="goal-card" aria-labelledby="goal-title">
+    // Meta batida: a borda do card fica verde
+    <section
+      className={isReached ? 'goal-card is-reached' : 'goal-card'}
+      aria-labelledby="goal-title"
+    >
       <div className="goal-top">
         <h2 id="goal-title" className="goal-title">
           Meta do mês: 50% de reuniões realizadas

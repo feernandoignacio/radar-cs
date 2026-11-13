@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS, type MessageSettings } from './message.ts';
 const STORAGE_KEY = 'radar-cs:batch:v1';
 const SETTINGS_KEY = 'radar-cs:settings:v1';
 const NOTES_KEY = 'radar-cs:notes:v1';
+const CELEBRATED_KEY = 'radar-cs:celebrated:v1';
 
 // Os dados ficam só no navegador dela. Nada vai para servidor.
 export function loadBatch(): Batch | null {
@@ -61,12 +62,30 @@ export function saveNotes(notes: string) {
   }
 }
 
+// Lote em que a meta já foi comemorada, para a festa aparecer uma vez só
+export function loadCelebrated(): string {
+  try {
+    return localStorage.getItem(CELEBRATED_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export function saveCelebrated(batchKey: string) {
+  try {
+    localStorage.setItem(CELEBRATED_KEY, batchKey);
+  } catch {
+    // Segue sem salvar
+  }
+}
+
 // Botão "Apagar dados": tira tudo deste navegador
 export function clearAll() {
   try {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(SETTINGS_KEY);
     localStorage.removeItem(NOTES_KEY);
+    localStorage.removeItem(CELEBRATED_KEY);
   } catch {
     // Nada a fazer
   }

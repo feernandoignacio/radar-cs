@@ -7,6 +7,15 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--surface);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Borda verde mais grossa sem mexer no tamanho do card */
+.goal-card.is-reached {
+  border-color: #1f9d62;
+  box-shadow: 0 0 0 1px #1f9d62;
 }
 
 .goal-top {
