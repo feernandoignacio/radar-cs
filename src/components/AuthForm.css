@@ -116,6 +116,60 @@
   text-decoration: underline;
 }
 
+.auth-error {
+  color: #b42318;
+  font-size: 13px;
+}
+
+/* Botão "Continuar com o Google": branco, arredondado, logo à esquerda */
+.google-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.google-button:hover:not(:disabled) {
+  background: #f3f6f8;
+}
+
+.google-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.google-logo {
+  position: absolute;
+  left: 16px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Linha com "ou" entre o Google e o formulário */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 .auth-proto {
   color: var(--text-muted);
   font-size: 12px;

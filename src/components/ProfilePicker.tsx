@@ -50,20 +50,24 @@ export function ProfilePicker({
   onLogout,
   onOpen,
 }: ProfilePickerProps) {
-  // Foto de perfil do email logado. Se não tiver, fica o avatar genérico.
-  const [photo, setPhoto] = useState<string | undefined>(undefined);
+  // Foto de perfil: a da conta Google, ou a do Gravatar do email.
+  // Se não carregar, fica o avatar genérico com as iniciais.
   const email = session?.email;
+  const googlePicture = session?.picture;
+  const [gravatar, setGravatar] = useState<string | undefined>(undefined);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const photo = photoFailed ? undefined : (googlePicture ?? gravatar);
 
   useEffect(() => {
-    if (!email) return;
+    if (googlePicture || !email) return;
     let active = true;
     void gravatarUrl(email).then((url) => {
-      if (active) setPhoto(url);
+      if (active) setGravatar(url);
     });
     return () => {
       active = false;
     };
-  }, [email]);
+  }, [email, googlePicture]);
 
   const mine: Card = {
     scope: 'me',
@@ -71,7 +75,7 @@ export function ProfilePicker({
     initials: initialsOf(session?.name ?? ''),
     color: '#25b574',
     colorTo: '#0e6b57',
-    photo: email ? photo : undefined,
+    photo,
     clients: loadBatch('me')?.clients ?? SAMPLE_CLIENTS,
     tag: 'Sua',
     tagKind: 'mine',
@@ -163,7 +167,7 @@ export function ProfilePicker({
                           src={card.photo}
                           alt=""
                           referrerPolicy="no-referrer"
-                          onError={() => setPhoto(undefined)}
+                          onError={() => setPhotoFailed(true)}
                         />
                       ) : (
                         <>

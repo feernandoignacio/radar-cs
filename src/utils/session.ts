@@ -4,6 +4,8 @@
 export type Session = {
   name: string;
   email: string;
+  // Foto da conta Google, quando a pessoa entra com o Google
+  picture?: string;
 };
 
 const SESSION_KEY = 'radar-cs:session:v1';

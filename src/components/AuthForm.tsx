@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { nameFromEmail, type Session } from '../utils/session.ts';
+import { GoogleButton } from './GoogleButton.tsx';
 import './AuthForm.css';
 
 type AuthFormProps = {
@@ -13,6 +14,8 @@ export function AuthForm({ onLogin }: AuthFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [error, setError] = useState('');
+  const handleError = useCallback((message: string) => setError(message), []);
 
   const isRegister = mode === 'register';
 
@@ -40,6 +43,9 @@ export function AuthForm({ onLogin }: AuthFormProps) {
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h1>{isRegister ? 'Criar conta' : 'Entrar'}</h1>
+
+      {/* Google primeiro, depois a linha "ou" e o formulário normal */}
+      <GoogleButton onLogin={onLogin} onError={handleError} />
 
       {isRegister && (
         <label>
@@ -98,6 +104,12 @@ export function AuthForm({ onLogin }: AuthFormProps) {
         <p className="auth-help">
           Fale com quem administra o Radar no seu time para criar uma senha
           nova.
+        </p>
+      )}
+
+      {error && (
+        <p className="auth-error" role="alert">
+          {error}
         </p>
       )}
 

@@ -36,7 +36,9 @@ export function Root() {
   if (scope === null || session === null) {
     return (
       <>
+        {/* key: outra conta monta a tela do zero, com a foto dela */}
         <ProfilePicker
+          key={session?.email ?? 'login'}
           today={today}
           session={session}
           onLogin={handleLogin}
