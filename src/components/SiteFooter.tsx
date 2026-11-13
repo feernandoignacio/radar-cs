@@ -8,7 +8,7 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <p className="site-footer-signature">
-        Desenvolvido por Fernando Ignacio © {YEAR}
+        Desenvolvido por Lucas Fernando © {YEAR}
       </p>
       <div className="site-footer-icons">
         <a

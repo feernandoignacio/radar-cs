@@ -16,7 +16,7 @@ Built to solve a real problem: the official dashboard only lists the batch and t
 - **One-click WhatsApp**: opens WhatsApp Web with the number and the message ready
 - **Send queue**: goes through the selected clients one by one
 - **Editable table**: add blank rows, delete rows, edit the reason inline, "Em análise" status left out of the goal
-- **PDF export**: a print-ready copy of the page without the controls, laid out for landscape A4, with page breaks that never split a row (libraries load only on click)
+- **PDF export**: a print-ready copy of the page without the controls, laid out for portrait A4, with page breaks that never split a row (libraries load only on click)
 
 ## Privacy
 
