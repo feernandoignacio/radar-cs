@@ -13,6 +13,20 @@
   --warning-text: #8a3b12;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-title: 'Space Grotesk', 'Inter', sans-serif;
+  /* Textura de fundo: pontinhos verdes e um brilho leve nos cantos */
+  --texture:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(14, 107, 87, 0.11),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(14, 107, 87, 0.08),
+      transparent 36%
+    ),
+    radial-gradient(rgba(14, 107, 87, 0.2) 1px, transparent 1.6px);
+  --texture-size: 100% 100%, 100% 100%, 22px 22px;
 }
 
 *,
@@ -23,7 +37,10 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: var(--texture);
+  background-size: var(--texture-size);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-body);
 }
