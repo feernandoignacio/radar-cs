@@ -44,49 +44,42 @@ import { getSummary } from './utils/summary.ts';
 import { normalizeName } from './utils/importBatch.ts';
 import { CoverBanner } from './components/CoverBanner.tsx';
 import { ShareDialog } from './components/ShareDialog.tsx';
-import { RECEIVED_ACCESS, colleagueById, demoClients } from './team.ts';
 import {
-  activeShares,
   loadShares,
   saveShares,
+  sharesGivenBy,
   type Share,
 } from './utils/shares.ts';
+import type { Session } from './utils/session.ts';
 import './App.css';
 
 type AppProps = {
-  // Carteira aberta: "me" é a da própria pessoa, o resto é de colegas
+  // Carteira aberta (a da pessoa ou a de um colega)
   scope: string;
+  // Carteira de quem está logado: guarda o modelo de mensagem dela
+  myScope: string;
+  session: Session;
+  // Acesso recebido, quando a carteira aberta é de um colega
+  share?: Share;
   today: string;
   onSwitch: () => void;
 };
 
-function App({ scope, today, onSwitch }: AppProps) {
-  const isOwner = scope === 'me';
-  const owner = colleagueById(scope);
-  const access = RECEIVED_ACCESS.find((item) => item.ownerId === scope);
+function App({ scope, myScope, session, share, today, onSwitch }: AppProps) {
+  const isOwner = scope === myScope;
   // Dona ou colega com "pode editar"
-  const canEdit = isOwner || access?.permission === 'edit';
+  const canEdit = isOwner || share?.permission === 'edit';
 
   // Lote salvo no navegador. Se ainda não tem, mostra o exemplo.
-  // Carteira de colega (protótipo) começa com clientes inventados.
-  const [savedBatch] = useState(
-    () =>
-      loadBatch(scope) ??
-      (isOwner
-        ? null
-        : {
-            importedAt: new Date().toISOString(),
-            clients: demoClients(scope),
-            removedIds: [],
-          }),
-  );
+  // Carteira de colega sem lote salvo fica vazia (sem exemplo inventado).
+  const [savedBatch] = useState(() => loadBatch(scope));
   const [importedAt, setImportedAt] = useState(savedBatch?.importedAt ?? null);
   const [clients, setClients] = useState<Client[]>(
-    savedBatch?.clients ?? SAMPLE_CLIENTS,
+    savedBatch?.clients ?? (isOwner ? SAMPLE_CLIENTS : []),
   );
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importInfo, setImportInfo] = useState('');
-  const [settings, setSettings] = useState(loadSettings);
+  const [settings, setSettings] = useState(() => loadSettings(myScope));
   const [queue, setQueue] = useState<Queue | null>(null);
   // Texto da busca por empresa (vazio = mostra todos)
   const [search, setSearch] = useState('');
@@ -99,7 +92,9 @@ function App({ scope, today, onSwitch }: AppProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   // Janela de confirmação aberta: excluir uma linha ou limpar tudo
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [shares, setShares] = useState(() => activeShares(loadShares(), today));
+  const [shares, setShares] = useState(() =>
+    sharesGivenBy(session.email, today),
+  );
   const [confirm, setConfirm] = useState<
     | { kind: 'delete'; client: Client }
     | { kind: 'clear' }
@@ -186,21 +181,27 @@ function App({ scope, today, onSwitch }: AppProps) {
     return isOwner ? text : `${text} por ${settings.myName || 'colega'}`;
   }
 
-  function handleAddShare(share: Share) {
-    const next = [...shares, share];
-    setShares(next);
-    saveShares(next);
+  // Um acesso novo para o mesmo email substitui o anterior
+  function handleAddShare(added: Share) {
+    const all = loadShares().filter(
+      (item) =>
+        !(
+          item.ownerEmail === added.ownerEmail &&
+          item.colleagueEmail === added.colleagueEmail
+        ),
+    );
+    saveShares([...all, added]);
+    setShares(sharesGivenBy(session.email, today));
   }
 
   function handleRemoveShare(id: string) {
-    const next = shares.filter((share) => share.id !== id);
-    setShares(next);
-    saveShares(next);
+    saveShares(loadShares().filter((item) => item.id !== id));
+    setShares(sharesGivenBy(session.email, today));
   }
 
   function handleSettingsChange(next: MessageSettings) {
     setSettings(next);
-    saveSettings(next);
+    saveSettings(next, myScope);
   }
 
   // Abre o WhatsApp Web com a mensagem pronta. Ela só aperta enviar.
@@ -290,7 +291,7 @@ function App({ scope, today, onSwitch }: AppProps) {
 
   function confirmBackup() {
     setConfirm(null);
-    downloadBackup();
+    downloadBackup(scope);
   }
 
   // Ela escolhe o arquivo; antes de trocar os dados, pede confirmação
@@ -306,12 +307,12 @@ function App({ scope, today, onSwitch }: AppProps) {
   }
 
   function confirmRestore(backup: BackupInfo) {
-    restoreBackup(backup.file);
+    restoreBackup(backup.file, scope);
     window.location.reload();
   }
 
   function handleClearData() {
-    clearAll();
+    clearAll(scope);
     window.location.reload();
   }
 
@@ -453,11 +454,9 @@ function App({ scope, today, onSwitch }: AppProps) {
           onSwitchClick={onSwitch}
         />
 
-        {!isOwner && owner && access && (
-          <CoverBanner owner={owner} access={access} onSwitch={onSwitch} />
-        )}
+        {!isOwner && share && <CoverBanner share={share} onSwitch={onSwitch} />}
 
-        {isSample && (
+        {isSample && isOwner && (
           <p className="app-notice">
             Você está vendo dados de exemplo. Clique em "Importar planilhas"
             para usar o seu lote do mês.
@@ -640,6 +639,8 @@ function App({ scope, today, onSwitch }: AppProps) {
         {isShareOpen && (
           <ShareDialog
             today={today}
+            ownerEmail={session.email}
+            ownerName={session.name}
             shares={shares}
             onAdd={handleAddShare}
             onRemove={handleRemoveShare}

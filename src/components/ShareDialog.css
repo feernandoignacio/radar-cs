@@ -190,3 +190,12 @@
     flex-direction: column;
   }
 }
+
+.share-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.share-list li strong {
+  word-break: break-all;
+}

@@ -1,15 +1,21 @@
-import type { Permission } from '../team.ts';
+// Acessos que uma pessoa dá à sua carteira para alguém do time.
+// PROTÓTIPO: ficam salvos neste navegador. Para testar, entre com uma
+// conta, dê acesso a outro email, saia e entre com esse outro email.
+// Com o banco de dados, isso passa a valer entre computadores.
+export type Permission = 'edit' | 'view';
 
-// Acessos que a dona da carteira deu para colegas
 export type Share = {
   id: string;
-  colleagueId: string;
+  ownerEmail: string;
+  ownerName: string;
+  colleagueEmail: string;
   permission: Permission;
+  // Dias no formato 2026-11-20
   from: string;
   until: string;
 };
 
-const SHARES_KEY = 'radar-cs:shares:v1';
+const SHARES_KEY = 'radar-cs:shares:v2';
 
 export function loadShares(): Share[] {
   try {
@@ -29,6 +35,20 @@ export function saveShares(shares: Share[]) {
 }
 
 // Acesso vencido some sozinho
-export function activeShares(shares: Share[], today: string) {
-  return shares.filter((share) => share.until >= today);
+export function isActive(share: Share, today: string) {
+  return share.from <= today && share.until >= today;
+}
+
+// Acessos que eu dei (ainda não vencidos)
+export function sharesGivenBy(email: string, today: string) {
+  return loadShares().filter(
+    (share) => share.ownerEmail === email && share.until >= today,
+  );
+}
+
+// Carteiras que outras pessoas abriram para mim, valendo hoje
+export function sharesReceivedBy(email: string, today: string) {
+  return loadShares().filter(
+    (share) => share.colleagueEmail === email && isActive(share, today),
+  );
 }

@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { TEAM, colleagueById, shortDay, type Permission } from '../team.ts';
-import type { Share } from '../utils/shares.ts';
+import { shortDay } from '../team.ts';
+import { nameFromEmail } from '../utils/session.ts';
+import type { Permission, Share } from '../utils/shares.ts';
 import { DateField } from './DateField.tsx';
-import { PersonSelect } from './PersonSelect.tsx';
 import './ConfirmDialog.css';
 import './ShareDialog.css';
 
 type ShareDialogProps = {
   today: string;
+  // Dona da carteira (quem está logado)
+  ownerEmail: string;
+  ownerName: string;
   shares: Share[];
   onAdd: (share: Share) => void;
   onRemove: (id: string) => void;
@@ -17,12 +20,14 @@ type ShareDialogProps = {
 // Janela "Dar acesso": a dona escolhe quem cuida, o período e o que pode fazer
 export function ShareDialog({
   today,
+  ownerEmail,
+  ownerName,
   shares,
   onAdd,
   onRemove,
   onClose,
 }: ShareDialogProps) {
-  const [colleagueId, setColleagueId] = useState(TEAM[0].id);
+  const [colleagueEmail, setColleagueEmail] = useState('');
   const [from, setFrom] = useState(today);
   const [until, setUntil] = useState('');
   const [permission, setPermission] = useState<Permission>('edit');
@@ -39,6 +44,15 @@ export function ShareDialog({
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    const email = colleagueEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Digite o email de quem vai cuidar.');
+      return;
+    }
+    if (email === ownerEmail) {
+      setError('Esse é o seu próprio email.');
+      return;
+    }
     if (!until) {
       setError('Escolha até quando vale o acesso.');
       return;
@@ -48,17 +62,22 @@ export function ShareDialog({
       return;
     }
     onAdd({
-      id: `${colleagueId}-${Date.now()}`,
-      colleagueId,
+      id: `${email}-${Date.now()}`,
+      ownerEmail,
+      ownerName,
+      colleagueEmail: email,
       permission,
       from,
       until,
     });
+    setColleagueEmail('');
     setUntil('');
     setError('');
   }
 
-  const owner = colleagueById(colleagueId);
+  const colleagueName = colleagueEmail.includes('@')
+    ? nameFromEmail(colleagueEmail).split(' ')[0]
+    : '';
 
   return (
     <div className="confirm-overlay" onClick={onClose}>
@@ -78,15 +97,16 @@ export function ShareDialog({
         </div>
 
         <form className="share-form" onSubmit={handleSubmit}>
-          <div className="share-field">
-            <span>Quem vai cuidar</span>
-            <PersonSelect
-              label="Quem vai cuidar"
-              people={TEAM}
-              value={colleagueId}
-              onChange={setColleagueId}
+          <label className="share-field">
+            Email de quem vai cuidar
+            <input
+              type="email"
+              value={colleagueEmail}
+              placeholder="colega@empresa.com"
+              autoComplete="off"
+              onChange={(event) => setColleagueEmail(event.target.value)}
             />
-          </div>
+          </label>
 
           <div className="share-dates">
             <div className="share-field">
@@ -140,8 +160,8 @@ export function ShareDialog({
           <p className="share-info">
             O acesso termina sozinho
             {until ? ` no dia ${shortDay(until)}` : ' na data final'}. O que{' '}
-            {owner?.name.split(' ')[0] ?? 'a pessoa'} mudar fica registrado com
-            o nome dele.
+            {colleagueName || 'a pessoa'} mudar fica registrado com o nome de
+            quem mudou.
           </p>
 
           {error && (
@@ -160,18 +180,21 @@ export function ShareDialog({
           </div>
         </form>
 
-        {shares.length > 0 && (
-          <div className="share-list">
-            <h3>Quem tem acesso agora</h3>
+        {/* Sempre visível: quem tem acesso e o botão para tirar */}
+        <div className="share-list">
+          <h3>Quem tem acesso agora</h3>
+          {shares.length === 0 ? (
+            <p className="share-empty">Ninguém tem acesso à sua carteira.</p>
+          ) : (
             <ul>
               {shares.map((share) => (
                 <li key={share.id}>
                   <span>
-                    <strong>{colleagueById(share.colleagueId)?.name}</strong>
+                    <strong>{share.colleagueEmail}</strong>
                     {share.permission === 'edit'
                       ? ' · pode editar'
                       : ' · só visualizar'}{' '}
-                    · até {shortDay(share.until)}
+                    · {shortDay(share.from)} a {shortDay(share.until)}
                   </span>
                   <button type="button" onClick={() => onRemove(share.id)}>
                     Tirar acesso
@@ -179,11 +202,12 @@ export function ShareDialog({
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          )}
+        </div>
 
         <p className="share-proto">
-          Protótipo: o acesso fica salvo só aqui e ainda não chega ao colega.
+          Protótipo: o acesso vale para quem entrar com esse email neste
+          navegador. Com o banco de dados, vai valer em qualquer computador.
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import type { Batch } from '../types.ts';
-import { ALL_KEYS } from './storage.ts';
+import { ALL_KEYS, scopedKey, type Scope } from './storage.ts';
 
 // Arquivo de backup: uma cópia de tudo o que está salvo no navegador
 type BackupFile = {
@@ -16,9 +16,12 @@ export type BackupInfo = {
 };
 
 // Baixa o backup como um arquivo .json, sem passar por nenhum servidor
-export function downloadBackup() {
+// O arquivo guarda as chaves sem o email, para poder restaurar em outra conta
+export function downloadBackup(scope: Scope) {
   const data: Record<string, string | null> = {};
-  for (const key of ALL_KEYS) data[key] = localStorage.getItem(key);
+  for (const key of ALL_KEYS) {
+    data[key] = localStorage.getItem(scopedKey(key, scope));
+  }
 
   const backup: BackupFile = {
     app: 'radar-cs',
@@ -63,13 +66,13 @@ export async function readBackup(file: File): Promise<BackupInfo> {
 }
 
 // Troca o que está no navegador pelo conteúdo do backup
-export function restoreBackup(backup: BackupFile) {
+export function restoreBackup(backup: BackupFile, scope: Scope) {
   for (const key of ALL_KEYS) {
     const value = backup.data[key];
     if (value === null || value === undefined) {
-      localStorage.removeItem(key);
+      localStorage.removeItem(scopedKey(key, scope));
     } else {
-      localStorage.setItem(key, value);
+      localStorage.setItem(scopedKey(key, scope), value);
     }
   }
 }

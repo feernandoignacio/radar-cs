@@ -1,13 +1,9 @@
 import { SAMPLE_CLIENTS } from '../sampleData.ts';
-import {
-  RECEIVED_ACCESS,
-  colleagueById,
-  demoClients,
-  shortDay,
-} from '../team.ts';
+import { initialsOf, paletteFor, shortDay } from '../team.ts';
+import { sharesReceivedBy } from '../utils/shares.ts';
 import type { Client } from '../types.ts';
 import { useEffect, useState } from 'react';
-import { loadBatch } from '../utils/storage.ts';
+import { loadBatch, userScope } from '../utils/storage.ts';
 import { getSummary } from '../utils/summary.ts';
 import { gravatarUrl, type Session } from '../utils/session.ts';
 import { AuthForm } from './AuthForm.tsx';
@@ -35,11 +31,6 @@ type Card = {
   tag: string;
   tagKind: 'mine' | 'edit' | 'view';
 };
-
-function initialsOf(name: string) {
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || 'EU';
-}
 
 // Tela de entrada, estilo "quem está assistindo": a carteira da pessoa
 // e as dos colegas que deram acesso para ela
@@ -70,38 +61,36 @@ export function ProfilePicker({
   }, [email, googlePicture]);
 
   const mine: Card = {
-    scope: 'me',
+    scope: userScope(email ?? ''),
     name: 'Minha carteira',
-    initials: initialsOf(session?.name ?? ''),
+    initials: initialsOf(session?.name ?? '') || 'EU',
     color: '#25b574',
     colorTo: '#0e6b57',
     photo,
-    clients: loadBatch('me')?.clients ?? SAMPLE_CLIENTS,
+    clients: loadBatch(userScope(email ?? ''))?.clients ?? SAMPLE_CLIENTS,
     tag: 'Sua',
     tagKind: 'mine',
   };
 
-  const shared: Card[] = RECEIVED_ACCESS.filter(
-    (access) => access.until >= today,
-  ).flatMap((access) => {
-    const owner = colleagueById(access.ownerId);
-    if (!owner) return [];
-    return [
-      {
-        scope: owner.id,
-        name: owner.name,
-        initials: initialsOf(owner.name),
-        color: owner.color,
-        colorTo: owner.colorTo,
-        clients: loadBatch(owner.id)?.clients ?? demoClients(owner.id),
-        tag:
-          access.permission === 'edit'
-            ? `${access.reason} até ${shortDay(access.until)}`
-            : `Só visualizar até ${shortDay(access.until)}`,
-        tagKind: access.permission,
-      },
-    ];
-  });
+  // Só aparecem as carteiras que alguém abriu para este email
+  const shared: Card[] = email
+    ? sharesReceivedBy(email, today).map((share) => {
+        const [from, to] = paletteFor(share.ownerEmail);
+        return {
+          scope: userScope(share.ownerEmail),
+          name: share.ownerName,
+          initials: initialsOf(share.ownerName),
+          color: from,
+          colorTo: to,
+          clients: loadBatch(userScope(share.ownerEmail))?.clients ?? [],
+          tag:
+            share.permission === 'edit'
+              ? `Pode editar até ${shortDay(share.until)}`
+              : `Só visualizar até ${shortDay(share.until)}`,
+          tagKind: share.permission,
+        };
+      })
+    : [];
 
   const cards = [mine, ...shared];
 
@@ -188,7 +177,8 @@ export function ProfilePicker({
                     </span>
                     <strong>{card.name}</strong>
                     <span className="picker-info">
-                      {total} clientes · meta {goal}
+                      {total} {total === 1 ? 'cliente' : 'clientes'} · meta{' '}
+                      {goal}
                     </span>
                     <span className={`picker-tag picker-tag-${card.tagKind}`}>
                       {card.tag}

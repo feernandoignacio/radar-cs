@@ -2,7 +2,13 @@ import { useState } from 'react';
 import App from './App.tsx';
 import { ProfilePicker } from './components/ProfilePicker.tsx';
 import { SiteFooter } from './components/SiteFooter.tsx';
-import { loadSettings, saveSettings } from './utils/storage.ts';
+import {
+  claimLegacyData,
+  loadSettings,
+  saveSettings,
+  userScope,
+} from './utils/storage.ts';
+import { sharesReceivedBy } from './utils/shares.ts';
 import {
   clearSession,
   loadSession,
@@ -18,22 +24,36 @@ export function Root() {
   const [session, setSession] = useState(loadSession);
 
   function handleLogin(next: Session) {
+    const scope = userScope(next.email);
+    // Dados de antes do login viram a carteira de quem entra primeiro
+    claimLegacyData(scope);
     saveSession(next);
     setSession(next);
     // Primeiro login: o nome já vira a assinatura do modelo da mensagem
-    const settings = loadSettings();
-    if (!settings.myName) {
-      saveSettings({ ...settings, myName: next.name.split(' ')[0] });
+    const settings = loadSettings(scope);
+    if (!settings.myName && next.name) {
+      saveSettings({ ...settings, myName: next.name.split(' ')[0] }, scope);
     }
   }
 
   function handleLogout() {
     clearSession();
     setSession(null);
+    setScope(null);
   }
 
-  // Sem login, sempre volta para a tela de entrada
-  if (scope === null || session === null) {
+  const myScope = session ? userScope(session.email) : '';
+  // Carteira de colega só abre com um acesso valendo hoje
+  const share =
+    session && scope && scope !== myScope
+      ? sharesReceivedBy(session.email, today).find(
+          (item) => userScope(item.ownerEmail) === scope,
+        )
+      : undefined;
+  const canOpen = scope !== null && (scope === myScope || share !== undefined);
+
+  // Sem login (ou sem acesso), volta para a tela de entrada
+  if (session === null || !canOpen) {
     return (
       <>
         {/* key: outra conta monta a tela do zero, com a foto dela */}
@@ -55,6 +75,9 @@ export function Root() {
     <App
       key={scope}
       scope={scope}
+      myScope={myScope}
+      session={session}
+      share={share}
       today={today}
       onSwitch={() => setScope(null)}
     />
