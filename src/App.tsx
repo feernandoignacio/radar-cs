@@ -62,8 +62,6 @@ function App() {
   // Confetes da comemoração da meta (null = sem festa na tela)
   const [confetti, setConfetti] = useState<ConfettiPiece[] | null>(null);
   const endCelebration = useCallback(() => setConfetti(null), []);
-  // Comemoração com os dados de exemplo: vale só até atualizar a página
-  const sampleCelebratedRef = useRef(false);
   // Área da página que vira o PDF (tudo, menos o modelo de mensagem)
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -93,16 +91,10 @@ function App() {
     const wasReached = isGoalReached(clients);
     if (wasReached || !isGoalReached(next)) return;
 
-    // Dados de exemplo resetam ao atualizar a página, e a festa reseta junto.
-    // Lote importado: fica salvo que já comemorou.
-    if (importedAt) {
-      if (loadCelebrated() === importedAt) return;
-      saveCelebrated(importedAt);
-    } else {
-      if (sampleCelebratedRef.current) return;
-      sampleCelebratedRef.current = true;
-    }
+    const batchKey = importedAt ?? 'exemplo';
+    if (loadCelebrated() === batchKey) return;
 
+    saveCelebrated(batchKey);
     setConfetti(makeConfetti());
     playCelebrationSound();
   }
